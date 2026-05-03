@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>MAFIA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:#03030a; --deep:#07071a;
+  --g1:rgba(255,255,255,.026); --g2:rgba(255,255,255,.052); --g3:rgba(255,255,255,.085);
+  --gb:rgba(255,255,255,.072); --gb-hi:rgba(255,255,255,.17);
+  --blur:blur(36px) saturate(180%);
+  --red:#C0192B; --red2:#E8203A; --red-g:rgba(192,25,43,.48); --red-d:rgba(192,25,43,.11);
+  --gold:#C9954C; --gold-d:rgba(201,149,76,.14);
+  --town:#2ECC82; --town-d:rgba(46,204,130,.11);
+  --t1:rgba(255,255,255,.93); --t2:rgba(255,255,255,.52); --t3:rgba(255,255,255,.27);
+  --sh-sm:0 2px 8px rgba(0,0,0,.32),0 1px 2px rgba(0,0,0,.4);
+  --sh-md:0 8px 32px rgba(0,0,0,.44),0 2px 8px rgba(0,0,0,.3);
+  --sh-lg:0 20px 60px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.4);
+  --sh-card:0 32px 80px rgba(0,0,0,.72),0 8px 24px rgba(0,0,0,.5);
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  --spring:cubic-bezier(0.34,1.56,0.64,1); --out:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Outfit',sans-serif;color:var(--t1);background:var(--void);overscroll-behavior:none}
+
+/* ── BACKGROUND ─────────────────────────────── */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;transition:all 1.2s ease}
+.bg::before{content:'';position:absolute;inset:0;animation:bgPulse 9s ease-in-out infinite alternate;transition:background 1.2s ease}
+.bg.day::before{background:radial-gradient(ellipse 90% 55% at 50% -10%,rgba(192,25,43,.17) 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 100% 100%,rgba(30,20,80,.22) 0%,transparent 55%),var(--deep)}
+.bg.night::before{background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(30,20,100,.3) 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 90% 80%,rgba(60,10,80,.2) 0%,transparent 55%),radial-gradient(ellipse 40% 60% at 10% 50%,rgba(10,30,80,.2) 0%,transparent 55%),#02020c}
+.bg.over::before{background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(30,60,30,.2) 0%,transparent 60%),var(--deep)}
+.bg.over-mafia::before{background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(192,25,43,.18) 0%,transparent 60%),var(--deep)}
+@keyframes bgPulse{from{opacity:.7;transform:scale(1)}to{opacity:1;transform:scale(1.04)}}
+
+/* ── APP ─────────────────────────────────────── */
+#app{position:relative;z-index:1;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;transition:opacity .22s var(--out),transform .26s var(--out)}
+#app.out{opacity:0;transform:translateY(10px) scale(.988)}
+.screen{min-height:100%;padding-bottom:calc(88px + var(--sab));padding-top:var(--sat)}
+.container{max-width:480px;margin:0 auto;padding:0 16px}
+
+/* ── GLASS ───────────────────────────────────── */
+.glass{background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--gb);border-top-color:var(--gb-hi);box-shadow:var(--sh-md),inset 0 1px 0 var(--gb-hi)}
+.g2{background:var(--g2);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
+
+/* ── LOGO ────────────────────────────────────── */
+.logo-block{text-align:center;padding:calc(38px + var(--sat)) 20px 26px}
+.logo-title{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:3.9rem;letter-spacing:.46em;text-indent:.46em;text-shadow:0 0 80px var(--red-g),0 0 28px rgba(192,25,43,.22)}
+.logo-sub{font-size:.7rem;letter-spacing:.36em;text-indent:.36em;text-transform:uppercase;color:var(--red2);opacity:.55;margin-top:7px}
+
+/* ── SECTION ─────────────────────────────────── */
+.sec{margin-bottom:22px}
+.lbl{font-size:.67rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;padding:0 4px}
+
+/* ── INPUT ───────────────────────────────────── */
+.irow{display:flex;gap:8px}
+input[type=text]{flex:1;background:var(--g2);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--gb);border-top-color:var(--gb-hi);border-radius:14px;padding:14px 18px;color:var(--t1);font-family:'Outfit',sans-serif;font-size:.94rem;outline:none;-webkit-appearance:none;transition:border-color .2s,box-shadow .2s;box-shadow:var(--sh-sm)}
+input[type=text]:focus{border-color:rgba(192,25,43,.45);box-shadow:0 0 0 3px rgba(192,25,43,.1),var(--sh-sm)}
+input[type=text]::placeholder{color:var(--t3)}
+
+/* ── BUTTONS ─────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:14px;font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:500;padding:15px 20px;cursor:pointer;-webkit-appearance:none;transition:transform .12s var(--spring),box-shadow .12s,opacity .12s;line-height:1;white-space:nowrap;min-height:50px;position:relative;overflow:hidden}
+.btn:active{transform:scale(.95)}
+.btn-block{display:flex;width:100%}
+.btn-row{display:flex;gap:8px}
+.btn-row .btn{flex:1}
+.btn-primary{background:linear-gradient(135deg,var(--red2) 0%,var(--red) 100%);color:#fff;box-shadow:0 4px 16px var(--red-g),0 1px 0 rgba(255,255,255,.1) inset;border-top:1px solid rgba(255,255,255,.14)}
+.btn-primary:active{box-shadow:0 2px 8px var(--red-g)}
+.btn-primary:disabled{background:var(--g2);color:var(--t3);box-shadow:none;cursor:not-allowed;border:1px solid var(--gb)}
+.btn-primary:disabled:active{transform:none}
+.btn-glass{background:var(--g2);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);color:var(--t2);border:1px solid var(--gb);border-top-color:var(--gb-hi);box-shadow:var(--sh-sm)}
+.btn-glass:active{background:var(--g3)}
+.btn-danger{background:var(--red-d);color:var(--red2);border:1px solid rgba(232,32,58,.24)}
+.btn-sm{padding:11px 16px;font-size:.85rem;min-height:42px;border-radius:11px}
+
+/* ── PLAYER LIST (Setup) ────────────────────── */
+.player-list{border-radius:18px;overflow:hidden;margin-top:10px;border:1px solid var(--gb);border-top-color:var(--gb-hi);box-shadow:var(--sh-md)}
+.p-row{display:flex;align-items:center;gap:12px;padding:13px 17px;background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid rgba(255,255,255,.04)}
+.p-row:last-child{border-bottom:none}
+.p-num{width:26px;height:26px;border-radius:50%;background:var(--g2);border:1px solid var(--gb);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:500;color:var(--t3);flex-shrink:0}
+.p-name{flex:1;font-size:.9rem}
+.p-del{background:none;border:none;color:var(--t3);cursor:pointer;padding:5px 9px;font-size:1rem;border-radius:8px;transition:color .15s,background .15s;line-height:1}
+.p-del:active{color:var(--red2);background:var(--red-d)}
+
+/* ── CONFIG LIST ─────────────────────────────── */
+.cfg-list{border-radius:18px;overflow:hidden;border:1px solid var(--gb);border-top-color:var(--gb-hi);box-shadow:var(--sh-md)}
+.cfg-row{display:flex;align-items:center;padding:14px 17px;background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid rgba(255,255,255,.04);gap:12px}
+.cfg-row:last-child{border-bottom:none}
+.cfg-row.tog-row{cursor:pointer;user-select:none}
+.cfg-info{flex:1}
+.cfg-name{font-size:.9rem;color:var(--t1)}
+.cfg-team{font-size:.68rem;margin-top:2px;color:var(--t3)}
+.cfg-team.m{color:rgba(232,32,58,.55)} .cfg-team.t{color:rgba(46,204,130,.55)} .cfg-team.n{color:rgba(155,111,216,.55)}
+.ctr-ctrl{display:flex;align-items:center;gap:13px}
+.c-btn{width:32px;height:32px;border-radius:50%;background:var(--g2);border:1px solid var(--gb);color:var(--t1);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s var(--spring)}
+.c-btn:active{transform:scale(.86);background:var(--g3)}
+.c-btn:disabled{color:var(--t3);cursor:not-allowed}
+.c-btn:disabled:active{transform:none}
+.c-val{font-size:.98rem;font-weight:500;min-width:22px;text-align:center}
+.tog-wrap{width:48px;height:28px;border-radius:14px;background:var(--g2);border:1px solid var(--gb);position:relative;transition:background .25s,border-color .25s,box-shadow .25s;flex-shrink:0}
+.tog-wrap.on{background:var(--red);border-color:var(--red);box-shadow:0 0 14px var(--red-g)}
+.tok{position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform .26s var(--spring);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.tog-wrap.on .tok{transform:translateX(20px)}
+
+/* ── VALIDATION ──────────────────────────────── */
+.val-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;font-size:.8rem;margin-bottom:14px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
+.val-bar.ok{background:var(--town-d);border:1px solid rgba(46,204,130,.2);color:var(--town)}
+.val-bar.err{background:var(--red-d);border:1px solid rgba(232,32,58,.2);color:var(--red2)}
+.val-bar.warn{background:var(--gold-d);border:1px solid rgba(201,149,76,.2);color:var(--gold)}
+
+/* ── PLAYING CARD ─────────────────────────────── */
+.card-scene{perspective:1200px;width:206px;height:288px;margin:0 auto;cursor:pointer}
+.card-body{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .68s cubic-bezier(0.34,1.56,0.64,1)}
+.card-body.flipped{transform:rotateY(180deg)}
+.card-face{position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;box-shadow:var(--sh-card)}
+
+/* Back */
+.card-back{background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(255,255,255,.07) 0%,transparent 60%),linear-gradient(135deg,#c0192b 0%,#8a0015 50%,#c0192b 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border:1px solid rgba(255,255,255,.13);border-top-color:rgba(255,255,255,.28)}
+.cb-inner{position:absolute;inset:12px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0px,rgba(255,255,255,.04) 1px,transparent 1px,transparent 11px),repeating-linear-gradient(-45deg,rgba(255,255,255,.04) 0px,rgba(255,255,255,.04) 1px,transparent 1px,transparent 11px)}
+.cb-suits{font-size:1.7rem;line-height:1.5;text-align:center;opacity:.24;position:relative;z-index:1}
+.cb-hint{font-size:.6rem;letter-spacing:.2em;color:rgba(255,255,255,.5);text-transform:uppercase;position:relative;z-index:1}
+
+/* Front */
+.card-front{transform:rotateY(180deg);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border:1px solid rgba(255,255,255,.12)}
+.cf-light{background:linear-gradient(160deg,#faf5ec 0%,#f0e8d4 100%)}
+.cf-dark{background:linear-gradient(160deg,#f0ece8 0%,#e4ddd6 100%)}
+.cf-gold{background:linear-gradient(160deg,#0c0a06 0%,#1a1508 100%);border-color:rgba(201,149,76,.32)!important}
+.cf-corner{position:absolute;font-family:'Cormorant Garamond',serif;font-size:.9rem;font-weight:700;line-height:1.3;text-align:center}
+.cf-corner.tl{top:10px;left:12px} .cf-corner.br{bottom:10px;right:12px;transform:rotate(180deg)}
+.cf-center{display:flex;flex-direction:column;align-items:center;gap:4px}
+.cf-val{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:900;line-height:.9}
+.cf-suit{font-size:2rem;line-height:1}
+.cf-rlabel{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;margin-top:8px;opacity:.38;font-family:'Outfit',sans-serif;font-weight:600}
+.cf-light .cf-corner,.cf-light .cf-center{color:#c01230}
+.cf-dark .cf-corner,.cf-dark .cf-center{color:#1c1510}
+.cf-gold .cf-corner,.cf-gold .cf-center{color:var(--gold)}
+
+@keyframes dealIn{from{opacity:0;transform:translateY(-55px) scale(.88) rotate(-4deg)}to{opacity:1;transform:translateY(0) scale(1) rotate(0deg)}}
+.card-deal{animation:dealIn .58s var(--spring) forwards}
+
+/* ── REVEAL SCREEN ───────────────────────────── */
+.reveal-screen{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:calc(44px + var(--sat)) 24px calc(64px + var(--sab));position:relative}
+.rev-glow{position:absolute;width:320px;height:320px;border-radius:50%;filter:blur(90px);opacity:.22;pointer-events:none;z-index:0;transition:all .6s ease}
+.rev-count{font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;color:var(--t3);margin-bottom:6px;position:relative;z-index:1}
+.rev-name{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:700;margin-bottom:34px;text-align:center;position:relative;z-index:1}
+.rev-card-wrap{margin-bottom:38px;position:relative;z-index:1}
+.rev-hint{font-size:.74rem;color:var(--t3);text-align:center;margin-bottom:28px;position:relative;z-index:1}
+.rev-actions{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .38s var(--out) forwards}
+
+/* ── GAME HEADER ─────────────────────────────── */
+.game-header{position:sticky;top:0;z-index:10;padding:calc(13px + var(--sat)) 20px 12px;background:rgba(3,3,10,.62);backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%);border-bottom:1px solid rgba(255,255,255,.055)}
+.gh-inner{max-width:480px;margin:0 auto}
+.gh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.gh-title{font-family:'Cormorant Garamond',serif;font-size:1.14rem;font-weight:700}
+.phase-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:.69rem;font-weight:500;letter-spacing:.03em}
+.pill-day{background:rgba(201,149,76,.1);color:var(--gold);border:1px solid rgba(201,149,76,.2)}
+.pill-night{background:rgba(100,80,180,.1);color:#a090e0;border:1px solid rgba(100,80,180,.2)}
+.pill-dawn{background:rgba(232,150,80,.1);color:#e8a060;border:1px solid rgba(232,150,80,.2)}
+.gh-sub{font-size:.71rem;color:var(--t3)}
+
+/* Step dots */
+.sdots{display:flex;gap:5px;align-items:center;margin-top:6px}
+.sdot{height:5px;width:5px;border-radius:3px;background:rgba(255,255,255,.11);transition:all .25s var(--spring)}
+.sdot.done{background:rgba(46,204,130,.45)}
+.sdot.active{width:20px;background:var(--red2);box-shadow:0 0 6px var(--red-g)}
+
+/* ── PLAYER CARDS (Game) ─────────────────────── */
+.gp{display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:16px;cursor:pointer;transition:all .14s var(--spring);background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--gb);border-top-color:rgba(255,255,255,.1);box-shadow:var(--sh-sm);margin-bottom:7px;position:relative;overflow:hidden}
+.gp::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gb-hi),transparent)}
+.gp:active{transform:scale(.97);background:var(--g2)}
+.gp.dead{opacity:.25;cursor:default;filter:grayscale(.6)} .gp.dead:active{transform:none}
+.gp.no-tap{cursor:default} .gp.no-tap:active{transform:none}
+.gp.sel{border-color:rgba(192,25,43,.5);background:rgba(192,25,43,.08);box-shadow:0 0 0 1px rgba(192,25,43,.28),var(--sh-sm)}
+.rpip{width:40px;height:52px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.rpip.red{background:linear-gradient(160deg,#faf5ec,#f0e4cc);color:#c01230}
+.rpip.black{background:linear-gradient(160deg,#f0ece8,#e0d8d0);color:#1c1510}
+.rpip.gold{background:linear-gradient(160deg,#0c0a06,#1a1508);color:var(--gold);border:1px solid rgba(201,149,76,.28)}
+.pip-v{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:900;line-height:1}
+.pip-s{font-size:.7rem;line-height:1.2}
+.gp-info{flex:1;min-width:0}
+.gp-name{font-size:.91rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gp-role{font-size:.7rem;color:var(--t3);margin-top:2px}
+.gp-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.badge{font-size:.59rem;padding:2px 7px;border-radius:5px;font-weight:600;letter-spacing:.04em}
+.b-mute{background:rgba(200,80,30,.14);color:#e09060;border:1px solid rgba(200,80,30,.2)}
+.b-novote{background:rgba(80,100,200,.14);color:#8090d0;border:1px solid rgba(80,100,200,.2)}
+.b-promo{background:rgba(201,149,76,.14);color:var(--gold);border:1px solid rgba(201,149,76,.22)}
+.gp-ck{color:var(--town);font-size:1.05rem;flex-shrink:0}
+
+/* ── NIGHT STEP ──────────────────────────────── */
+.step-card{border-radius:20px;padding:24px 20px;text-align:center;margin-bottom:16px;background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--gb);border-top-color:var(--gb-hi);box-shadow:var(--sh-md),inset 0 1px 0 var(--gb-hi);animation:fadeUp .34s var(--out) forwards}
+.step-icon{font-size:2.8rem;margin-bottom:10px}
+.step-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;margin-bottom:6px}
+.step-desc{font-size:.8rem;color:var(--t2);line-height:1.6}
+.step-result{margin-top:13px;padding:11px 14px;border-radius:11px;font-size:.84rem;font-weight:500}
+.sres-ok{background:var(--town-d);color:var(--town);border:1px solid rgba(46,204,130,.2)}
+.sres-bad{background:var(--red-d);color:var(--red2);border:1px solid rgba(232,32,58,.2)}
+.ac-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.ac-btn{padding:16px 12px;border-radius:14px;text-align:center;cursor:pointer;transition:all .14s var(--spring);background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--gb);box-shadow:var(--sh-sm)}
+.ac-btn:active{transform:scale(.96)}
+.ac-btn.sel{border-color:rgba(192,25,43,.42);background:rgba(192,25,43,.09);box-shadow:0 0 0 1px rgba(192,25,43,.22),var(--sh-sm)}
+.ac-icon{font-size:1.5rem;margin-bottom:6px}
+.ac-label{font-size:.87rem;font-weight:500;margin-bottom:2px}
+.ac-desc{font-size:.7rem;color:var(--t3)}
+
+/* ── RESOLUTION ──────────────────────────────── */
+@keyframes evSlide{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:translateX(0)}}
+.res-ev{display:flex;align-items:flex-start;gap:13px;padding:14px 16px;border-radius:15px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);margin-bottom:8px;animation:evSlide .4s var(--out) forwards;opacity:0}
+.rev-death{background:rgba(192,25,43,.09);border:1px solid rgba(192,25,43,.22)}
+.rev-save{background:var(--town-d);border:1px solid rgba(46,204,130,.2)}
+.rev-info{background:var(--g1);border:1px solid var(--gb)}
+.rev-tort{background:var(--gold-d);border:1px solid rgba(201,149,76,.2)}
+.rev-dok{background:var(--town-d);border:1px solid rgba(46,204,130,.2)}
+.rev-dbad{background:var(--red-d);border:1px solid rgba(232,32,58,.2)}
+.rev-icon{font-size:1.3rem;flex-shrink:0;margin-top:1px}
+.rev-title{font-size:.88rem;font-weight:600;margin-bottom:3px}
+.rev-msg{font-size:.78rem;color:var(--t2);line-height:1.5}
+
+/* ── MODAL ───────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:100;display:flex;align-items:flex-end;animation:ovIn .2s ease forwards}
+@keyframes ovIn{from{opacity:0}to{opacity:1}}
+.modal-sheet{width:100%;max-width:480px;margin:0 auto;background:rgba(8,7,20,.96);backdrop-filter:blur(44px) saturate(180%);-webkit-backdrop-filter:blur(44px) saturate(180%);border:1px solid var(--gb);border-top-color:var(--gb-hi);border-radius:26px 26px 0 0;padding:18px 22px calc(20px + var(--sab));box-shadow:0 -8px 40px rgba(0,0,0,.5);animation:sheetUp .3s var(--spring) forwards}
+@keyframes sheetUp{from{transform:translateY(44px);opacity:.5}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:36px;height:4px;background:rgba(255,255,255,.14);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;margin-bottom:5px}
+.modal-sub{font-size:.8rem;color:var(--t2);margin-bottom:20px;line-height:1.55}
+
+/* ── BOTTOM BAR ──────────────────────────────── */
+.bottom-bar-outer{position:fixed;bottom:0;left:0;right:0;z-index:10;background:rgba(3,3,10,.72);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);border-top:1px solid rgba(255,255,255,.055)}
+.bottom-bar{max-width:480px;margin:0 auto;padding:12px 16px calc(12px + var(--sab));display:flex;gap:8px}
+
+/* ── GAME OVER ───────────────────────────────── */
+.go-screen{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:calc(52px + var(--sat)) 20px calc(64px + var(--sab))}
+.go-badge{font-size:5.5rem;margin-bottom:18px;animation:badgePop .62s var(--spring) .1s both}
+@keyframes badgePop{from{opacity:0;transform:scale(.5) rotate(-10deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+.go-winner{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:900;text-align:center;margin-bottom:6px}
+.go-winner.tw{color:var(--town);text-shadow:0 0 40px rgba(46,204,130,.38)}
+.go-winner.mf{color:var(--red2);text-shadow:0 0 40px var(--red-g)}
+.go-sub{font-size:.88rem;color:var(--t2);margin-bottom:32px;text-align:center}
+.go-sec{width:100%;margin-bottom:22px}
+
+/* ── SKELETON ────────────────────────────────── */
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel{background:linear-gradient(90deg,rgba(255,255,255,.03) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.03) 75%);background-size:200% 100%;animation:shimmer 1.7s ease-in-out infinite;border-radius:16px;margin-bottom:7px}
+
+/* ── UTILS ───────────────────────────────────── */
+.divider{height:1px;background:rgba(255,255,255,.05);margin:14px 0}
+.mt8{margin-top:8px} .mt12{margin-top:12px} .mt16{margin-top:16px} .mt20{margin-top:20px} .mt24{margin-top:24px}
+.mb8{margin-bottom:8px} .mb12{margin-bottom:12px} .mb16{margin-bottom:16px}
+.flex{display:flex} .flex-1{flex:1} .gap8{gap:8px} .gap12{gap:12px}
+.tc{text-align:center} .tdim{color:var(--t2);font-size:.8rem} .tred{color:var(--red2)} .tgold{color:var(--gold)} .tgreen{color:var(--town)}
+</style>
+</head>
+<body>
+<div class="bg day" id="bg"></div>
+<div id="app"></div>
+<div id="mc"></div>
+
+<script>
+// ============================================================
+// ROLE DEFINITIONS
+// ============================================================
+const ROLES = {
+  killer:   { label:'Killer',    val:'K',  suit:'♠', pip:'black', team:'mafia',   cs:'cf-dark'  },
+  torturer: { label:'Torturer',  val:'T',  suit:'♣', pip:'black', team:'mafia',   cs:'cf-dark'  },
+  whore:    { label:'Whore',     val:'Q',  suit:'♥', pip:'red',   team:'neutral', cs:'cf-light' },
+  detective:{ label:'Detective', val:'J',  suit:'♦', pip:'red',   team:'town',    cs:'cf-light' },
+  doctor:   { label:'Doctor',    val:'10', suit:'♥', pip:'red',   team:'town',    cs:'cf-light' },
+  joker:    { label:'Joker',     val:'★',  suit:'✦', pip:'gold',  team:'neutral', cs:'cf-gold'  },
+  civilian: { label:'Civilian',  val:'2',  suit:'♠', pip:'black', team:'town',    cs:'cf-dark'  },
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let G = {
+  screen:'setup', players:[], config:{killers:1,torturers:0,doctors:0,detectives:0,whore:false,joker:false},
+  revealIdx:0, cardFlipped:false, round:1, phase:'day',
+  nightSteps:[], nightStepIdx:0, nightActions:{}, torturerAction:null,
+  resolution:[], gameResult:null, torturerPromoted:false,
+};
+let nameInput = '';
+let modalPlayerId = null;
+let _trans = false;
+
+// ============================================================
+// HELPERS
+// ============================================================
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function alive(){return G.players.filter(p=>p.alive)}
+function aliveRole(r){return G.players.filter(p=>p.alive&&p.role===r)}
+function getP(id){return G.players.find(p=>p.id===id)}
+function activeKillerIds(){return G.players.filter(p=>p.alive&&(p.role==='killer'||(p.role==='torturer'&&p.promoted))).map(p=>p.id)}
+function totalRoles(){const c=G.config;return c.killers+c.torturers+c.doctors+c.detectives+(c.whore?1:0)+(c.joker?1:0)}
+function civCount(){return Math.max(0,G.players.length-totalRoles())}
+function isValid(){return G.players.length>=3&&G.config.killers>=1&&totalRoles()<=G.players.length}
+function valMsg(){
+  if(!G.players.length) return{t:'warn',msg:'Add at least 3 players.'};
+  if(G.players.length<3) return{t:'err',msg:`Need at least 3 players (have ${G.players.length}).`};
+  if(G.config.killers<1) return{t:'err',msg:'Need at least 1 Killer.'};
+  if(totalRoles()>G.players.length) return{t:'err',msg:`${totalRoles()} roles but only ${G.players.length} players.`};
+  const c=civCount();
+  return{t:'ok',msg:`Ready! ${c} Civilian${c!==1?'s':''} will fill remaining spots.`};
+}
+
+// ============================================================
+// TRANSITION SYSTEM
+// ============================================================
+function goTo(renderFn, bgClass='day'){
+  if(_trans) return;
+  _trans = true;
+  const app = document.getElementById('app');
+  app.classList.add('out');
+  document.getElementById('bg').className = 'bg '+bgClass;
+  setTimeout(()=>{
+    app.innerHTML = renderFn();
+    requestAnimationFrame(()=>{
+      app.classList.remove('out');
+      _trans = false;
+    });
+    bindEv();
+  }, 230);
+}
+
+// ============================================================
+// SETUP ACTIONS
+// ============================================================
+function addPlayer(name){
+  name=(name||'').trim();
+  if(!name) return;
+  G.players.push({id:uid(),name,role:null,alive:true,canTalk:true,canVote:true,promoted:false});
+  nameInput='';
+  render();
+  setTimeout(()=>{const el=document.getElementById('ni');if(el){el.value='';el.focus();}},30);
+}
+function removePlayer(id){G.players=G.players.filter(p=>p.id!==id);render()}
+function setConfig(key,val){G.config[key]=val;render()}
+
+function startGame(){
+  if(!isValid()) return;
+  const pool=[];
+  for(let i=0;i<G.config.killers;i++) pool.push('killer');
+  for(let i=0;i<G.config.torturers;i++) pool.push('torturer');
+  for(let i=0;i<G.config.doctors;i++) pool.push('doctor');
+  for(let i=0;i<G.config.detectives;i++) pool.push('detective');
+  if(G.config.whore) pool.push('whore');
+  if(G.config.joker) pool.push('joker');
+  while(pool.length<G.players.length) pool.push('civilian');
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  G.players.forEach((p,i)=>{p.role=pool[i];p.alive=true;p.canTalk=true;p.canVote=true;p.promoted=false;});
+  G.revealIdx=0; G.cardFlipped=false; G.screen='reveal';
+  goTo(renderReveal, 'night');
+}
+
+// ============================================================
+// REVEAL ACTIONS
+// ============================================================
+function flipCard(){G.cardFlipped=true;render()}
+function nextReveal(){
+  G.revealIdx++; G.cardFlipped=false;
+  if(G.revealIdx>=G.players.length){G.screen='game';G.phase='day';G.round=1;resetNight();goTo(renderDay,'day');}
+  else render();
+}
+
+// ============================================================
+// NIGHT SETUP
+// ============================================================
+function resetNight(){
+  G.nightActions={jokerAwoke:false,jokerSugg:null,killTarget:null,tortTarget:null,tortAction:null,whoreTarget:null,doctorSave:null,detectCheck:null};
+  G.torturerAction=null;
+}
+function buildSteps(){
+  const s=[];
+  if(aliveRole('joker').length>0) s.push({id:'joker',icon:'🃏',title:'The Joker'});
+  if(activeKillerIds().length>0) s.push({id:'kill',icon:'🔪',title:'Killers Wake Up'});
+  if(aliveRole('torturer').length>0&&!G.torturerPromoted) s.push({id:'torturer',icon:'🔧',title:'Torturer Wakes Up'});
+  if(aliveRole('whore').length>0) s.push({id:'whore',icon:'♥',title:'The Whore'});
+  if(aliveRole('doctor').length>0) s.push({id:'doctor',icon:'💊',title:'Doctor Wakes Up'});
+  if(aliveRole('detective').length>0) s.push({id:'detective',icon:'🔍',title:'Detective Wakes Up'});
+  return s;
+}
+function startNight(){
+  G.players.forEach(p=>{p.canTalk=true;p.canVote=true;});
+  G.phase='night'; resetNight();
+  G.nightSteps=buildSteps(); G.nightStepIdx=0;
+  if(!G.nightSteps.length){resolveNight();return;}
+  goTo(renderNight,'night');
+}
+function curStep(){return G.nightSteps[G.nightStepIdx]||null}
+
+// ============================================================
+// NIGHT ACTIONS
+// ============================================================
+function nightPick(id){
+  const step=curStep(); if(!step) return;
+  const a=G.nightActions;
+  switch(step.id){
+    case 'joker': if(!a.jokerAwoke) return; a.jokerSugg=a.jokerSugg===id?null:id; break;
+    case 'kill': a.killTarget=a.killTarget===id?null:id; break;
+    case 'torturer': if(!G.torturerAction) return; a.tortTarget=a.tortTarget===id?null:id; a.tortAction=G.torturerAction; break;
+    case 'whore': a.whoreTarget=a.whoreTarget===id?null:id; break;
+    case 'doctor': a.doctorSave=a.doctorSave===id?null:id; break;
+    case 'detective': a.detectCheck=a.detectCheck===id?null:id; break;
+  }
+  render();
+}
+function toggleJoker(){G.nightActions.jokerAwoke=!G.nightActions.jokerAwoke;if(!G.nightActions.jokerAwoke)G.nightActions.jokerSugg=null;render()}
+function pickTortAction(act){G.torturerAction=G.torturerAction===act?null:act;G.nightActions.tortAction=G.torturerAction;G.nightActions.tortTarget=null;render()}
+function nextStep(){G.nightStepIdx++;G.torturerAction=null;if(G.nightStepIdx>=G.nightSteps.length)resolveNight();else render()}
+function skipStep(){
+  const step=curStep(); if(!step) return;
+  const a=G.nightActions;
+  switch(step.id){
+    case 'joker': a.jokerAwoke=false;a.jokerSugg=null;break;
+    case 'kill': a.killTarget=null;break;
+    case 'torturer': a.tortTarget=null;a.tortAction=null;break;
+    case 'whore': a.whoreTarget=null;break;
+    case 'doctor': a.doctorSave=null;break;
+    case 'detective': a.detectCheck=null;break;
+  }
+  G.torturerAction=null; G.nightStepIdx++;
+  if(G.nightStepIdx>=G.nightSteps.length) resolveNight(); else render();
+}
+
+// ============================================================
+// NIGHT RESOLUTION
+// ============================================================
+function resolveNight(){
+  const a=G.nightActions; const events=[];
+  const killerIds=activeKillerIds();
+  const whoreP=G.players.find(p=>p.alive&&p.role==='whore');
+  let killTarget=a.killTarget;
+  if(killTarget){
+    if(a.whoreTarget&&killerIds.includes(a.whoreTarget)){
+      events.push({cls:'rev-info',icon:'🃏',title:'No kill tonight',msg:'The Whore slept with the Killer — all night actions are cancelled.'});
+      killTarget=null;
+    } else {
+      const tgt=getP(killTarget);
+      const isWhore=whoreP&&killTarget===whoreP.id;
+      const isWhorePartner=whoreP&&killTarget===a.whoreTarget&&!isWhore;
+      if(isWhore){
+        if(a.doctorSave===whoreP.id){events.push({cls:'rev-save',icon:'💊',title:`${esc(whoreP.name)} saved`,msg:'Doctor protected the Whore. Her partner is also safe.'});}
+        else{killP(whoreP.id);events.push({cls:'rev-death',icon:'💀',title:`${esc(whoreP.name)} was killed`,msg:'The Whore was eliminated.'});
+          if(a.whoreTarget){const partner=getP(a.whoreTarget);if(partner&&partner.alive){killP(a.whoreTarget);events.push({cls:'rev-death',icon:'💀',title:`${esc(partner.name)} also dies`,msg:'They were with the Whore and share her fate.'});}}}
+      } else if(isWhorePartner){
+        if(a.doctorSave===killTarget){events.push({cls:'rev-save',icon:'💊',title:`${esc(tgt?.name)} saved`,msg:'Doctor saved the target. The Whore also survives.'});}
+        else{if(tgt)killP(killTarget);events.push({cls:'rev-death',icon:'💀',title:`${esc(tgt?.name)} was killed`,msg:"They were the Whore's bed partner."});
+          if(whoreP&&whoreP.alive){killP(whoreP.id);events.push({cls:'rev-death',icon:'💀',title:`${esc(whoreP.name)} also dies`,msg:'The Whore shared the fate of her partner.'});}}
+      } else {
+        if(a.doctorSave===killTarget){events.push({cls:'rev-save',icon:'💊',title:`${esc(tgt?.name)} saved`,msg:'The Doctor protected this player tonight.'});}
+        else{if(tgt)killP(killTarget);events.push({cls:'rev-death',icon:'💀',title:`${esc(tgt?.name)} was killed`,msg:'Eliminated by the Mafia.'});}
+      }
+    }
+  } else events.push({cls:'rev-info',icon:'🌙',title:'Quiet night',msg:'No kill was made tonight.'});
+
+  if(a.tortTarget&&a.tortAction&&!G.torturerPromoted){
+    const tgt=getP(a.tortTarget);
+    if(tgt&&tgt.alive){
+      if(a.tortAction==='mouth'){tgt.canTalk=false;events.push({cls:'rev-tort',icon:'🤐',title:`${esc(tgt.name)} silenced`,msg:`${esc(tgt.name)} cannot speak during today's discussion.`});}
+      else{tgt.canVote=false;events.push({cls:'rev-tort',icon:'✋',title:`${esc(tgt.name)} restrained`,msg:`${esc(tgt.name)} cannot vote today.`});}
+    }
+  }
+  if(a.detectCheck){
+    const tgt=getP(a.detectCheck);
+    if(tgt){
+      const isMafia=['killer','torturer'].includes(tgt.role);
+      events.push({cls:isMafia?'rev-dbad':'rev-dok',icon:isMafia?'👎':'👍',title:`${esc(tgt.name)}: ${isMafia?'MAFIA':'NOT mafia'}`,msg:isMafia?'Show thumbs DOWN to the Detective.':'Show thumbs UP to the Detective.'});
+    }
+  }
+  const promo=checkPromotion();
+  if(promo.length>0) events.push({cls:'rev-info',icon:'♛',title:'Succession',msg:`${promo.map(p=>esc(p.name)).join(', ')} takes the Killer's place.`});
+  G.resolution=events;
+  if(!checkWin()){G.phase='resolution';goTo(renderResolution,'night');}
+}
+function killP(id){const p=getP(id);if(p)p.alive=false;}
+function checkPromotion(){
+  if(G.torturerPromoted) return[];
+  const ka=G.players.filter(p=>p.alive&&p.role==='killer');
+  const ta=G.players.filter(p=>p.alive&&p.role==='torturer'&&!p.promoted);
+  if(ka.length===0&&ta.length>0){ta.forEach(t=>t.promoted=true);G.torturerPromoted=true;return ta;}
+  return[];
+}
+function checkWin(){
+  const ap=alive();
+  const ma=ap.filter(p=>p.role==='killer'||p.role==='torturer').length;
+  const ta=ap.filter(p=>['civilian','detective','doctor'].includes(p.role)).length;
+  if(ma===0){G.gameResult='town';G.screen='gameover';goTo(renderGameover,'over');return true;}
+  if(ma>=ta){G.gameResult='mafia';G.screen='gameover';goTo(renderGameover,'over-mafia');return true;}
+  return false;
+}
+function endResolution(){G.round++;G.phase='day';goTo(renderDay,'day')}
+function resetGame(){
+  G={screen:'setup',players:G.players.map(p=>({...p,role:null,alive:true,canTalk:true,canVote:true,promoted:false})),
+     config:{...G.config},revealIdx:0,cardFlipped:false,round:1,phase:'day',
+     nightSteps:[],nightStepIdx:0,nightActions:{},torturerAction:null,resolution:[],gameResult:null,torturerPromoted:false};
+  nameInput=''; goTo(renderSetup,'day');
+}
+
+// ============================================================
+// DAY ACTIONS
+// ============================================================
+function showElimModal(id){
+  modalPlayerId=id; const p=getP(id); if(!p) return;
+  const mc=document.getElementById('mc');
+  if(!mc) return;
+  mc.innerHTML=`<div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Eliminate ${esc(p.name)}?</div>
+      <div class="modal-sub">This removes them permanently. Their role will be revealed to all players.</div>
+      <div class="btn-row">
+        <button class="btn btn-glass" onclick="closeModalEl()">Cancel</button>
+        <button class="btn btn-danger" onclick="confirmElim()">Eliminate</button>
+      </div>
+    </div></div>`;
+}
+function closeModal(e){if(e.target.classList.contains('modal-overlay')) closeModalEl()}
+function closeModalEl(){const mc=document.getElementById('mc');if(mc)mc.innerHTML='';modalPlayerId=null;}
+function confirmElim(){
+  if(!modalPlayerId) return;
+  const p=getP(modalPlayerId);
+  if(p){p.alive=false;checkPromotion();}
+  modalPlayerId=null;
+  if(!checkWin()) render();
+}
+function skipVote(){startNight()}
+
+// ============================================================
+// RENDER DISPATCH
+// ============================================================
+function render(){
+  const app=document.getElementById('app');
+  if(G.screen==='setup') app.innerHTML=renderSetup();
+  else if(G.screen==='reveal') app.innerHTML=renderReveal();
+  else if(G.screen==='game'){
+    if(G.phase==='day') app.innerHTML=renderDay();
+    else if(G.phase==='night') app.innerHTML=renderNight();
+    else app.innerHTML=renderResolution();
+  } else if(G.screen==='gameover') app.innerHTML=renderGameover();
+  bindEv();
+}
+
+// ============================================================
+// RENDER: SETUP
+// ============================================================
+function renderSetup(){
+  const c=G.config; const v=valMsg();
+  const pList=G.players.length?`
+    <div class="player-list mt12">
+      ${G.players.map((p,i)=>`
+        <div class="p-row">
+          <div class="p-num">${i+1}</div>
+          <div class="p-name">${esc(p.name)}</div>
+          <button class="p-del" onclick="removePlayer('${p.id}')">✕</button>
+        </div>`).join('')}
+    </div>`:'';
+  return `<div class="screen">
+    <div class="logo-block">
+      <div class="logo-title">MAFIA</div>
+      <div class="logo-sub">♠ ♥ ♦ ♣</div>
+    </div>
+    <div class="container">
+      <div class="sec">
+        <div class="lbl">Players</div>
+        <div class="irow">
+          <input type="text" id="ni" placeholder="Enter player name…" maxlength="20" autocomplete="off" autocorrect="off" autocapitalize="words">
+          <button class="btn btn-primary btn-sm" onclick="addPlayer(document.getElementById('ni').value)">Add</button>
+        </div>
+        ${pList}
+      </div>
+      <div class="sec">
+        <div class="lbl">Roles</div>
+        <div class="cfg-list">
+          ${cfgCtr('killers','Killers','Mafia','m',1,10,c.killers)}
+          ${cfgCtr('torturers','Torturers','Mafia','m',0,5,c.torturers)}
+          ${cfgCtr('doctors','Doctors','Town','t',0,5,c.doctors)}
+          ${cfgCtr('detectives','Detectives','Town','t',0,5,c.detectives)}
+          ${cfgTog('whore','Whore','Neutral · Survive to win','n',c.whore)}
+          ${cfgTog('joker','Joker','Neutral · Survive to win','n',c.joker)}
+        </div>
+      </div>
+      <div class="val-bar ${v.t}">
+        <span style="font-size:1rem">${v.t==='ok'?'✓':v.t==='err'?'✕':'◦'}</span>
+        <span>${v.msg}</span>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="startGame()" ${isValid()?'':'disabled'}>
+        Deal Cards &amp; Start
+      </button>
+    </div>
+  </div>`;
+}
+
+function cfgCtr(key,name,team,tc,min,max,val){
+  return `<div class="cfg-row">
+    <div class="cfg-info">
+      <div class="cfg-name">${name}</div>
+      <div class="cfg-team ${tc}">${team}</div>
+    </div>
+    <div class="ctr-ctrl">
+      <button class="c-btn" onclick="setConfig('${key}',Math.max(${min},G.config['${key}']-1))" ${val<=min?'disabled':''}>−</button>
+      <span class="c-val">${val}</span>
+      <button class="c-btn" onclick="setConfig('${key}',Math.min(${max},G.config['${key}']+1))" ${val>=max?'disabled':''}>+</button>
+    </div>
+  </div>`;
+}
+
+function cfgTog(key,name,team,tc,val){
+  return `<div class="cfg-row tog-row" onclick="setConfig('${key}',!G.config['${key}'])">
+    <div class="cfg-info">
+      <div class="cfg-name">${name}</div>
+      <div class="cfg-team ${tc}">${team}</div>
+    </div>
+    <div class="tog-wrap ${val?'on':''}"><div class="tok"></div></div>
+  </div>`;
+}
+
+// ============================================================
+// RENDER: REVEAL
+// ============================================================
+function renderReveal(){
+  if(G.revealIdx>=G.players.length) return '';
+  const p=G.players[G.revealIdx]; const r=ROLES[p.role];
+  const total=G.players.length; const isLast=G.revealIdx===total-1;
+  const glowColor=r.team==='mafia'?'var(--red)':r.team==='neutral'?'#9B6FD8':'var(--town)';
+  const cardHTML=`
+    <div class="card-scene card-deal" onclick="${G.cardFlipped?'':'flipCard()'}">
+      <div class="card-body${G.cardFlipped?' flipped':''}">
+        <div class="card-face card-back">
+          <div class="cb-inner"></div>
+          <div class="cb-suits">♠ ♥<br>♦ ♣</div>
+          <div class="cb-hint">Tap to reveal</div>
+        </div>
+        <div class="card-face card-front ${r.cs}">
+          <div class="cf-corner tl">${r.val}<br>${r.suit}</div>
+          <div class="cf-corner br">${r.val}<br>${r.suit}</div>
+          <div class="cf-center">
+            <div class="cf-val">${r.val}</div>
+            <div class="cf-suit">${r.suit}</div>
+            <div class="cf-rlabel">${r.label}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  return `<div class="screen">
+    <div class="reveal-screen">
+      ${G.cardFlipped?`<div class="rev-glow" style="background:${glowColor}"></div>`:''}
+      <div class="rev-count">${G.revealIdx+1} of ${total}</div>
+      <div class="rev-name">${esc(p.name)}</div>
+      <div class="rev-card-wrap">${cardHTML}</div>
+      ${G.cardFlipped
+        ? `<div class="rev-hint fade-up">Remember your role, then pass the phone face-down.</div>
+           <div class="rev-actions fade-up">
+             <button class="btn btn-primary btn-block" onclick="nextReveal()">
+               ${isLast?'Give to Narrator →':`Pass to ${esc(G.players[G.revealIdx+1].name)} →`}
+             </button>
+           </div>`
+        : `<div class="rev-hint">Only ${esc(p.name)} should be looking 👀</div>`}
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// RENDER: DAY
+// ============================================================
+function renderDay(){
+  const aliveP=alive(); const deadP=G.players.filter(p=>!p.alive);
+  return `<div class="screen">
+    <div class="game-header">
+      <div class="gh-inner">
+        <div class="gh-top">
+          <div class="gh-title">Round ${G.round}</div>
+          <div class="phase-pill pill-day">☀️ Day Phase</div>
+        </div>
+        <div class="gh-sub">${aliveP.length} alive · Tap a player to eliminate</div>
+      </div>
+    </div>
+    <div class="container mt12">
+      <div class="lbl mb8">Alive</div>
+      ${aliveP.map(p=>gpCard(p,true)).join('')}
+      ${deadP.length?`<div class="divider"></div><div class="lbl mb8">Eliminated</div>${deadP.map(p=>gpCard(p,false)).join('')}`:''}
+    </div>
+    <div class="bottom-bar-outer">
+      <div class="bottom-bar">
+        <button class="btn btn-glass flex-1" onclick="skipVote()">Skip Vote</button>
+        <button class="btn btn-primary flex-1" onclick="startNight()">Begin Night 🌙</button>
+      </div>
+    </div>
+    <div id="mc"></div>
+  </div>`;
+}
+
+function gpCard(p, clickable){
+  const r=ROLES[p.role];
+  const badges=[];
+  if(!p.canTalk) badges.push(`<span class="badge b-mute">🤐 Muted</span>`);
+  if(!p.canVote) badges.push(`<span class="badge b-novote">✋ No Vote</span>`);
+  if(p.promoted) badges.push(`<span class="badge b-promo">★ Killer</span>`);
+  const click=clickable&&p.alive?`onclick="showElimModal('${p.id}')"`:''
+  return `<div class="gp${!p.alive?' dead':''} ${!clickable||!p.alive?'no-tap':''}" ${click}>
+    <div class="rpip ${r.pip}">
+      <div class="pip-v">${r.val}</div>
+      <div class="pip-s">${r.suit}</div>
+    </div>
+    <div class="gp-info">
+      <div class="gp-name">${esc(p.name)}</div>
+      <div class="gp-role">${r.label}${!p.alive?' · Eliminated':''}</div>
+      ${badges.length?`<div class="gp-badges">${badges.join('')}</div>`:''}
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// RENDER: NIGHT
+// ============================================================
+function renderNight(){
+  const step=curStep(); if(!step) return '<div></div>';
+  const dots=G.nightSteps.map((s,i)=>
+    `<div class="sdot ${i<G.nightStepIdx?'done':i===G.nightStepIdx?'active':''}"></div>`).join('');
+  return `<div class="screen">
+    <div class="game-header" style="background:rgba(2,2,12,.72);">
+      <div class="gh-inner">
+        <div class="gh-top">
+          <div class="gh-title">Round ${G.round}</div>
+          <div class="phase-pill pill-night">🌙 Night Phase</div>
+        </div>
+        <div class="sdots mt8">${dots}</div>
+      </div>
+    </div>
+    <div class="container mt12">
+      ${renderStep(step)}
+    </div>
+    <div id="mc"></div>
+  </div>`;
+}
+
+function renderStep(step){
+  switch(step.id){
+    case 'joker':    return stepJoker();
+    case 'kill':     return stepKill();
+    case 'torturer': return stepTorturer();
+    case 'whore':    return stepWhore();
+    case 'doctor':   return stepDoctor();
+    case 'detective':return stepDetective();
+  }
+  return '';
+}
+
+function nPick(p, selectedId){
+  const r=ROLES[p.role]; const sel=p.id===selectedId;
+  return `<div class="gp${sel?' sel':''}" onclick="nightPick('${p.id}')">
+    <div class="rpip ${r.pip}"><div class="pip-v">${r.val}</div><div class="pip-s">${r.suit}</div></div>
+    <div class="gp-info">
+      <div class="gp-name">${esc(p.name)}</div>
+      <div class="gp-role">${r.label}</div>
+    </div>
+    ${sel?`<div class="gp-ck">✓</div>`:''}
+  </div>`;
+}
+
+function stepJoker(){
+  const a=G.nightActions; const others=alive().filter(p=>p.role!=='joker');
+  return `<div class="step-card">
+    <div class="step-icon">🃏</div>
+    <div class="step-title">The Joker</div>
+    <div class="step-desc">Does the Joker wake up to suggest a target to the Killers?</div>
+  </div>
+  <div class="lbl">Action</div>
+  <div class="ac-grid mb12">
+    <div class="ac-btn${a.jokerAwoke?' sel':''}" onclick="toggleJoker()">
+      <div class="ac-icon">👁</div><div class="ac-label">Woke Up</div><div class="ac-desc">Points to someone</div>
+    </div>
+    <div class="ac-btn${!a.jokerAwoke?' sel':''}" onclick="toggleJoker()">
+      <div class="ac-icon">😴</div><div class="ac-label">Sleeping</div><div class="ac-desc">Stays in bed</div>
+    </div>
+  </div>
+  ${a.jokerAwoke?`<div class="lbl">Joker's suggestion</div>${others.map(p=>nPick(p,a.jokerSugg)).join('')}`:''}
+  <div class="bottom-bar-outer">
+    <div class="bottom-bar">
+      <button class="btn btn-glass flex-1" onclick="skipStep()">Skip</button>
+      <button class="btn btn-primary flex-1" onclick="nextStep()">Next →</button>
+    </div>
+  </div>`;
+}
+
+function stepKill(){
+  const a=G.nightActions;
+  const killers=G.players.filter(p=>p.alive&&(p.role==='killer'||(p.role==='torturer'&&p.promoted)));
+  const targets=alive().filter(p=>!killers.find(k=>k.id===p.id));
+  const sugg=a.jokerSugg?getP(a.jokerSugg):null;
+  return `<div class="step-card">
+    <div class="step-icon">🔪</div>
+    <div class="step-title">Killers Wake Up</div>
+    <div class="step-desc">${killers.map(k=>esc(k.name)).join(', ')} open${killers.length===1?'s':''} their eyes.${sugg?`<br><br><span class="tgold" style="font-size:.82rem">Joker suggested: ${esc(sugg.name)}</span>`:''}</div>
+  </div>
+  <div class="lbl">Choose kill target</div>
+  ${targets.map(p=>nPick(p,a.killTarget)).join('')}
+  <div class="bottom-bar-outer">
+    <div class="bottom-bar">
+      <button class="btn btn-glass flex-1" onclick="skipStep()">No Kill</button>
+      <button class="btn btn-primary flex-1" onclick="nextStep()">Confirm →</button>
+    </div>
+  </div>`;
+}
+
+function stepTorturer(){
+  const a=G.nightActions; const ta=G.torturerAction;
+  const tort=aliveRole('torturer').filter(p=>!p.promoted)[0];
+  const targets=alive();
+  return `<div class="step-card">
+    <div class="step-icon">🔧</div>
+    <div class="step-title">Torturer Wakes Up</div>
+    <div class="step-desc">${tort?esc(tort.name):'Torturer'} chooses how to mutilate. Can target anyone including self or Killers.</div>
+  </div>
+  <div class="lbl">Choose mutilation</div>
+  <div class="ac-grid mb12">
+    <div class="ac-btn${ta==='mouth'?' sel':''}" onclick="pickTortAction('mouth')">
+      <div class="ac-icon">🤐</div><div class="ac-label">Mouth</div><div class="ac-desc">Can't speak today</div>
+    </div>
+    <div class="ac-btn${ta==='hands'?' sel':''}" onclick="pickTortAction('hands')">
+      <div class="ac-icon">✋</div><div class="ac-label">Hands</div><div class="ac-desc">Can't vote today</div>
+    </div>
+  </div>
+  ${ta?`<div class="lbl">Select target</div>${targets.map(p=>nPick(p,a.tortTarget)).join('')}`:''}
+  <div class="bottom-bar-outer">
+    <div class="bottom-bar">
+      <button class="btn btn-glass flex-1" onclick="skipStep()">Skip</button>
+      <button class="btn btn-primary flex-1" onclick="nextStep()">Confirm →</button>
+    </div>
+  </div>`;
+}
+
+function stepWhore(){
+  const a=G.nightActions; const whore=aliveRole('whore')[0];
+  const others=alive().filter(p=>p.role!=='whore');
+  return `<div class="step-card">
+    <div class="step-icon">♥</div>
+    <div class="step-title">The Whore</div>
+    <div class="step-desc">${whore?esc(whore.name):'Whore'} chooses who to sleep with. If she picks the Killer — no kill. If her partner gets killed — both die.</div>
+  </div>
+  <div class="lbl">Choose bed partner</div>
+  ${others.map(p=>nPick(p,a.whoreTarget)).join('')}
+  <div class="bottom-bar-outer">
+    <div class="bottom-bar">
+      <button class="btn btn-glass flex-1" onclick="skipStep()">Nobody</button>
+      <button class="btn btn-primary flex-1" onclick="nextStep()">Confirm →</button>
+    </div>
+  </div>`;
+}
+
+function stepDoctor(){
+  const a=G.nightActions; const doc=aliveRole('doctor')[0];
+  const canSelf=G.round>1;
+  const targets=alive().filter(p=>canSelf||p.role!=='doctor');
+  return `<div class="step-card">
+    <div class="step-icon">💊</div>
+    <div class="step-title">Doctor Wakes Up</div>
+    <div class="step-desc">${doc?esc(doc.name):'Doctor'} chooses who to protect tonight.${!canSelf?`<br><span style="font-size:.74rem;color:var(--t3)">Cannot save self in round 1.</span>`:''}</div>
+  </div>
+  <div class="lbl">Select player to save</div>
+  ${targets.map(p=>nPick(p,a.doctorSave)).join('')}
+  <div class="bottom-bar-outer">
+    <div class="bottom-bar">
+      <button class="btn btn-glass flex-1" onclick="skipStep()">Skip</button>
+      <button class="btn btn-primary flex-1" onclick="nextStep()">Confirm →</button>
+    </div>
+  </div>`;
+}
+
+function stepDetective(){
+  const a=G.nightActions; const det=aliveRole('detective')[0];
+  const targets=alive().filter(p=>p.role!=='detective');
+  let result='';
+  if(a.detectCheck){
+    const tgt=getP(a.detectCheck);
+    if(tgt){
+      const isMafia=['killer','torturer'].includes(tgt.role);
+      result=`<div class="step-result ${isMafia?'sres-bad':'sres-ok'}">
+        ${isMafia?'👎 MAFIA — show thumbs down':'👍 Not mafia — show thumbs up'} to ${esc(det?.name||'Detective')}
+      </div>`;
+    }
+  }
+  return `<div class="step-card">
+    <div class="step-icon">🔍</div>
+    <div class="step-title">Detective Wakes Up</div>
+    <div class="step-desc">${det?esc(det.name):'Detective'} points to a suspect. Show thumbs to them.${result}</div>
+  </div>
+  <div class="lbl">Select suspect</div>
+  ${targets.map(p=>nPick(p,a.detectCheck)).join('')}
+  <div class="bottom-bar-outer">
+    <div class="bottom-bar">
+      <button class="btn btn-glass flex-1" onclick="skipStep()">Skip</button>
+      <button class="btn btn-primary flex-1" onclick="nextStep()">Finish Night →</button>
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// RENDER: RESOLUTION
+// ============================================================
+function renderResolution(){
+  return `<div class="screen">
+    <div class="game-header" style="background:rgba(2,2,12,.72);">
+      <div class="gh-inner">
+        <div class="gh-top">
+          <div class="gh-title">Round ${G.round} — Dawn</div>
+          <div class="phase-pill pill-dawn">🌅 Night Ends</div>
+        </div>
+        <div class="gh-sub">Narrator announces results to everyone</div>
+      </div>
+    </div>
+    <div class="container mt12">
+      <div class="lbl mb8">What happened tonight</div>
+      ${G.resolution.map((e,i)=>`
+        <div class="res-ev ${e.cls}" style="animation-delay:${i*0.08}s">
+          <div class="rev-icon">${e.icon}</div>
+          <div class="flex-1">
+            <div class="rev-title">${e.title}</div>
+            <div class="rev-msg">${e.msg}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="bottom-bar-outer">
+      <div class="bottom-bar">
+        <button class="btn btn-primary btn-block" onclick="endResolution()">☀️ Begin Day ${G.round+1}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// RENDER: GAME OVER
+// ============================================================
+function renderGameover(){
+  const win=G.gameResult==='town';
+  const sections=[
+    {label:'Mafia',roles:['killer','torturer']},
+    {label:'Town',roles:['civilian','detective','doctor']},
+    {label:'Neutral',roles:['whore','joker']},
+  ].filter(s=>G.players.some(p=>s.roles.includes(p.role)));
+  return `<div class="screen">
+    <div class="go-screen">
+      <div class="go-badge">${win?'⚖️':'🔪'}</div>
+      <div class="go-winner ${win?'tw':'mf'}">${win?'Town Wins':'Mafia Wins'}</div>
+      <div class="go-sub">${win?'The Mafia has been eliminated.':'The Mafia has taken control.'}</div>
+      ${sections.map(s=>`
+        <div class="go-sec">
+          <div class="lbl mb8">${s.label}</div>
+          ${G.players.filter(p=>s.roles.includes(p.role)).map((p,i)=>`
+            <div style="animation:fadeUp .4s var(--out) ${.12+i*.07}s both">
+              ${gpCard(p,false)}
+            </div>`).join('')}
+        </div>`).join('')}
+      <button class="btn btn-primary btn-block mt8" onclick="resetGame()">New Game</button>
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// BIND EVENTS
+// ============================================================
+function bindEv(){
+  const ni=document.getElementById('ni');
+  if(ni){
+    ni.value=nameInput;
+    ni.addEventListener('input',e=>nameInput=e.target.value);
+    ni.addEventListener('keydown',e=>{if(e.key==='Enter')addPlayer(ni.value)});
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+render();
+</script>
+</body>
+</html>
