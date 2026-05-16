@@ -1,982 +1,2172 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>MAFIA</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --void:#03030a; --deep:#07071a;
-  --g1:rgba(255,255,255,.026); --g2:rgba(255,255,255,.052); --g3:rgba(255,255,255,.085);
-  --gb:rgba(255,255,255,.072); --gb-hi:rgba(255,255,255,.17);
-  --blur:blur(36px) saturate(180%);
-  --red:#C0192B; --red2:#E8203A; --red-g:rgba(192,25,43,.48); --red-d:rgba(192,25,43,.11);
-  --gold:#C9954C; --gold-d:rgba(201,149,76,.14);
-  --town:#2ECC82; --town-d:rgba(46,204,130,.11);
-  --t1:rgba(255,255,255,.93); --t2:rgba(255,255,255,.52); --t3:rgba(255,255,255,.27);
-  --sh-sm:0 2px 8px rgba(0,0,0,.32),0 1px 2px rgba(0,0,0,.4);
-  --sh-md:0 8px 32px rgba(0,0,0,.44),0 2px 8px rgba(0,0,0,.3);
-  --sh-lg:0 20px 60px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.4);
-  --sh-card:0 32px 80px rgba(0,0,0,.72),0 8px 24px rgba(0,0,0,.5);
-  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
-  --spring:cubic-bezier(0.34,1.56,0.64,1); --out:cubic-bezier(0.16,1,0.3,1);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
-html,body{height:100%;overflow:hidden}
-body{font-family:'Outfit',sans-serif;color:var(--t1);background:var(--void);overscroll-behavior:none}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07050D">
+  <title>MAFIA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@400;500;600;700&display=swap"></noscript>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07050D;
+      --surface-1: #0C0A18;
+      --surface-2: #111028;
+      --border: rgba(255,255,255,.07);
+      --border-active: rgba(255,255,255,.14);
+      --red: #B81228;
+      --red-hot: #D81436;
+      --gold: #B8920C;
+      --gold-hot: #D4AA14;
+      --green: #1A6040;
+      --green-hot: #22B060;
+      --blue: #6888D0;
+      --text: #E2D6C0;
+      --text-2: #887868;
+      --text-3: #4A4038;
+      --paper: #F0E7D4;
+      --ink: #1B1820;
+      --spring: cubic-bezier(.34, 1.56, .64, 1);
+      --steady: cubic-bezier(.22, .61, .36, 1);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
 
-/* ── BACKGROUND ─────────────────────────────── */
-.bg{position:fixed;inset:0;z-index:0;pointer-events:none;transition:all 1.2s ease}
-.bg::before{content:'';position:absolute;inset:0;animation:bgPulse 9s ease-in-out infinite alternate;transition:background 1.2s ease}
-.bg.day::before{background:radial-gradient(ellipse 90% 55% at 50% -10%,rgba(192,25,43,.17) 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 100% 100%,rgba(30,20,80,.22) 0%,transparent 55%),var(--deep)}
-.bg.night::before{background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(30,20,100,.3) 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 90% 80%,rgba(60,10,80,.2) 0%,transparent 55%),radial-gradient(ellipse 40% 60% at 10% 50%,rgba(10,30,80,.2) 0%,transparent 55%),#02020c}
-.bg.over::before{background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(30,60,30,.2) 0%,transparent 60%),var(--deep)}
-.bg.over-mafia::before{background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(192,25,43,.18) 0%,transparent 60%),var(--deep)}
-@keyframes bgPulse{from{opacity:.7;transform:scale(1)}to{opacity:1;transform:scale(1.04)}}
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; background: var(--bg); }
+    body {
+      color: var(--text);
+      font-family: Outfit, ui-sans-serif, system-ui, sans-serif;
+      font-size: 15px;
+      letter-spacing: 0;
+      touch-action: manipulation;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
 
-/* ── APP ─────────────────────────────────────── */
-#app{position:relative;z-index:1;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;transition:opacity .22s var(--out),transform .26s var(--out)}
-#app.out{opacity:0;transform:translateY(10px) scale(.988)}
-.screen{min-height:100%;padding-bottom:calc(88px + var(--sab));padding-top:var(--sat)}
-.container{max-width:480px;margin:0 auto;padding:0 16px}
+    button, input { font: inherit; }
+    button { border: 0; color: inherit; cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .42; }
 
-/* ── GLASS ───────────────────────────────────── */
-.glass{background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--gb);border-top-color:var(--gb-hi);box-shadow:var(--sh-md),inset 0 1px 0 var(--gb-hi)}
-.g2{background:var(--g2);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
+    .ambient {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(104,136,208,.12), transparent 36%),
+        linear-gradient(180deg, #090710 0%, #07050D 42%, #05040A 100%);
+      pointer-events: none;
+      contain: strict;
+    }
+    .ambient::before,
+    .ambient::after {
+      content: "";
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      border-radius: 999px;
+      filter: blur(80px);
+      opacity: .72;
+      transform: translateZ(0);
+      animation: blobDrift 10s var(--steady) infinite alternate;
+    }
+    .ambient::before {
+      left: -160px;
+      top: -130px;
+      background: radial-gradient(circle, rgba(216,20,54,.75), rgba(184,18,40,.18) 48%, transparent 72%);
+    }
+    .ambient::after {
+      right: -170px;
+      bottom: -130px;
+      background: radial-gradient(circle, rgba(82,57,151,.72), rgba(17,16,40,.26) 52%, transparent 74%);
+      animation-duration: 12s;
+      animation-direction: alternate-reverse;
+    }
+    @keyframes blobDrift {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(34px, 24px, 0) scale(1.12); }
+    }
 
-/* ── LOGO ────────────────────────────────────── */
-.logo-block{text-align:center;padding:calc(38px + var(--sat)) 20px 26px}
-.logo-title{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:3.9rem;letter-spacing:.46em;text-indent:.46em;text-shadow:0 0 80px var(--red-g),0 0 28px rgba(192,25,43,.22)}
-.logo-sub{font-size:.7rem;letter-spacing:.36em;text-indent:.36em;text-transform:uppercase;color:var(--red2);opacity:.55;margin-top:7px}
+    #stars {
+      position: fixed;
+      inset: 0;
+      opacity: 0;
+      transition: opacity .7s var(--steady);
+      pointer-events: none;
+      contain: strict;
+    }
+    body.night #stars { opacity: 1; }
+    .star {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: var(--s);
+      height: var(--s);
+      border-radius: 50%;
+      background: rgba(255,255,255,.92);
+      opacity: .26;
+      animation: twinkle var(--d) ease-in-out infinite alternate;
+      transform: translateZ(0);
+    }
+    @keyframes twinkle {
+      from { opacity: .12; transform: scale(.72) translateZ(0); }
+      to { opacity: .86; transform: scale(1.2) translateZ(0); }
+    }
 
-/* ── SECTION ─────────────────────────────────── */
-.sec{margin-bottom:22px}
-.lbl{font-size:.67rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;padding:0 4px}
+    #app {
+      position: relative;
+      z-index: 2;
+      height: 100dvh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      padding: calc(var(--safe-top) + 14px) 14px calc(var(--safe-bottom) + 96px);
+      transition: opacity .22s var(--steady), transform .22s var(--steady);
+      contain: layout style;
+    }
+    #app.is-moving { opacity: 0; transform: translate3d(0, 18px, 0); }
 
-/* ── INPUT ───────────────────────────────────── */
-.irow{display:flex;gap:8px}
-input[type=text]{flex:1;background:var(--g2);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--gb);border-top-color:var(--gb-hi);border-radius:14px;padding:14px 18px;color:var(--t1);font-family:'Outfit',sans-serif;font-size:.94rem;outline:none;-webkit-appearance:none;transition:border-color .2s,box-shadow .2s;box-shadow:var(--sh-sm)}
-input[type=text]:focus{border-color:rgba(192,25,43,.45);box-shadow:0 0 0 3px rgba(192,25,43,.1),var(--sh-sm)}
-input[type=text]::placeholder{color:var(--t3)}
+    .screen {
+      width: min(100%, 560px);
+      min-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 28px);
+      margin: 0 auto;
+      animation: screenIn .42s var(--spring) both;
+      contain: layout style;
+    }
+    @keyframes screenIn {
+      from { opacity: 0; transform: translate3d(0, 22px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
 
-/* ── BUTTONS ─────────────────────────────────── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:14px;font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:500;padding:15px 20px;cursor:pointer;-webkit-appearance:none;transition:transform .12s var(--spring),box-shadow .12s,opacity .12s;line-height:1;white-space:nowrap;min-height:50px;position:relative;overflow:hidden}
-.btn:active{transform:scale(.95)}
-.btn-block{display:flex;width:100%}
-.btn-row{display:flex;gap:8px}
-.btn-row .btn{flex:1}
-.btn-primary{background:linear-gradient(135deg,var(--red2) 0%,var(--red) 100%);color:#fff;box-shadow:0 4px 16px var(--red-g),0 1px 0 rgba(255,255,255,.1) inset;border-top:1px solid rgba(255,255,255,.14)}
-.btn-primary:active{box-shadow:0 2px 8px var(--red-g)}
-.btn-primary:disabled{background:var(--g2);color:var(--t3);box-shadow:none;cursor:not-allowed;border:1px solid var(--gb)}
-.btn-primary:disabled:active{transform:none}
-.btn-glass{background:var(--g2);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);color:var(--t2);border:1px solid var(--gb);border-top-color:var(--gb-hi);box-shadow:var(--sh-sm)}
-.btn-glass:active{background:var(--g3)}
-.btn-danger{background:var(--red-d);color:var(--red2);border:1px solid rgba(232,32,58,.24)}
-.btn-sm{padding:11px 16px;font-size:.85rem;min-height:42px;border-radius:11px}
+    .glass {
+      position: relative;
+      overflow: hidden;
+      background: rgba(255, 255, 255, .045);
+      -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(1.08);
+      backdrop-filter: blur(32px) saturate(200%) brightness(1.08);
+      border: 1px solid rgba(255, 255, 255, .10);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .14),
+        inset 0 -1px 0 rgba(0, 0, 0, .18),
+        0 20px 60px rgba(0, 0, 0, .5);
+    }
+    .glass::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(255,255,255,.105) 0%, rgba(255,255,255,.03) 42%, transparent 72%);
+      pointer-events: none;
+    }
+    .glass-lite {
+      position: relative;
+      overflow: hidden;
+      background: rgba(255, 255, 255, .038);
+      -webkit-backdrop-filter: blur(22px) saturate(170%) brightness(1.04);
+      backdrop-filter: blur(22px) saturate(170%) brightness(1.04);
+      border: 1px solid var(--border);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.09), 0 14px 36px rgba(0,0,0,.32);
+    }
 
-/* ── PLAYER LIST (Setup) ────────────────────── */
-.player-list{border-radius:18px;overflow:hidden;margin-top:10px;border:1px solid var(--gb);border-top-color:var(--gb-hi);box-shadow:var(--sh-md)}
-.p-row{display:flex;align-items:center;gap:12px;padding:13px 17px;background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid rgba(255,255,255,.04)}
-.p-row:last-child{border-bottom:none}
-.p-num{width:26px;height:26px;border-radius:50%;background:var(--g2);border:1px solid var(--gb);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:500;color:var(--t3);flex-shrink:0}
-.p-name{flex:1;font-size:.9rem}
-.p-del{background:none;border:none;color:var(--t3);cursor:pointer;padding:5px 9px;font-size:1rem;border-radius:8px;transition:color .15s,background .15s;line-height:1}
-.p-del:active{color:var(--red2);background:var(--red-d)}
+    .logo-wrap { padding: 26px 6px 22px; text-align: center; }
+    .logo {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 4.15rem;
+      line-height: .82;
+      font-weight: 700;
+      letter-spacing: 0;
+      color: var(--text);
+      text-shadow: 0 1px 0 rgba(255,255,255,.08), 0 22px 70px rgba(216,20,54,.22);
+    }
+    .suits { margin-top: 12px; color: var(--gold-hot); font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.15rem; }
+    .kicker {
+      margin-top: 12px;
+      color: var(--text-2);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+    }
 
-/* ── CONFIG LIST ─────────────────────────────── */
-.cfg-list{border-radius:18px;overflow:hidden;border:1px solid var(--gb);border-top-color:var(--gb-hi);box-shadow:var(--sh-md)}
-.cfg-row{display:flex;align-items:center;padding:14px 17px;background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid rgba(255,255,255,.04);gap:12px}
-.cfg-row:last-child{border-bottom:none}
-.cfg-row.tog-row{cursor:pointer;user-select:none}
-.cfg-info{flex:1}
-.cfg-name{font-size:.9rem;color:var(--t1)}
-.cfg-team{font-size:.68rem;margin-top:2px;color:var(--t3)}
-.cfg-team.m{color:rgba(232,32,58,.55)} .cfg-team.t{color:rgba(46,204,130,.55)} .cfg-team.n{color:rgba(155,111,216,.55)}
-.ctr-ctrl{display:flex;align-items:center;gap:13px}
-.c-btn{width:32px;height:32px;border-radius:50%;background:var(--g2);border:1px solid var(--gb);color:var(--t1);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s var(--spring)}
-.c-btn:active{transform:scale(.86);background:var(--g3)}
-.c-btn:disabled{color:var(--t3);cursor:not-allowed}
-.c-btn:disabled:active{transform:none}
-.c-val{font-size:.98rem;font-weight:500;min-width:22px;text-align:center}
-.tog-wrap{width:48px;height:28px;border-radius:14px;background:var(--g2);border:1px solid var(--gb);position:relative;transition:background .25s,border-color .25s,box-shadow .25s;flex-shrink:0}
-.tog-wrap.on{background:var(--red);border-color:var(--red);box-shadow:0 0 14px var(--red-g)}
-.tok{position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform .26s var(--spring);box-shadow:0 1px 4px rgba(0,0,0,.3)}
-.tog-wrap.on .tok{transform:translateX(20px)}
+    .panel { border-radius: 24px; padding: 16px; margin-bottom: 14px; }
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0 10px;
+      color: var(--text-2);
+      font-size: .74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .13em;
+    }
+    .section-label svg { width: 15px; height: 15px; }
+    .muted { color: var(--text-2); }
+    .tiny { color: var(--text-3); font-size: .75rem; }
 
-/* ── VALIDATION ──────────────────────────────── */
-.val-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;font-size:.8rem;margin-bottom:14px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
-.val-bar.ok{background:var(--town-d);border:1px solid rgba(46,204,130,.2);color:var(--town)}
-.val-bar.err{background:var(--red-d);border:1px solid rgba(232,32,58,.2);color:var(--red2)}
-.val-bar.warn{background:var(--gold-d);border:1px solid rgba(201,149,76,.2);color:var(--gold)}
+    .input-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+    .name-input {
+      min-width: 0;
+      height: 48px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.09);
+      outline: none;
+      background: rgba(0,0,0,.28);
+      color: var(--text);
+      padding: 0 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    .name-input:focus { border-color: rgba(212,170,20,.36); box-shadow: 0 0 0 3px rgba(212,170,20,.10), inset 0 1px 0 rgba(255,255,255,.05); }
 
-/* ── PLAYING CARD ─────────────────────────────── */
-.card-scene{perspective:1200px;width:206px;height:288px;margin:0 auto;cursor:pointer}
-.card-body{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .68s cubic-bezier(0.34,1.56,0.64,1)}
-.card-body.flipped{transform:rotateY(180deg)}
-.card-face{position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;box-shadow:var(--sh-card)}
+    .btn {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border-radius: 14px;
+      padding: 0 16px;
+      font-weight: 700;
+      font-size: .86rem;
+      letter-spacing: 0;
+      transition: transform .18s var(--spring), opacity .18s var(--steady), border-color .18s var(--steady), background .18s var(--steady);
+      transform: translateZ(0);
+      user-select: none;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(.975) translateZ(0); }
+    .btn svg { width: 18px; height: 18px; flex: 0 0 auto; }
+    .btn-primary {
+      color: #fff8e8;
+      background: linear-gradient(180deg, #D81436, #961225);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 18px 34px rgba(184,18,40,.32);
+    }
+    .btn-gold {
+      color: #19100A;
+      background: linear-gradient(180deg, #F1C640, #B8920C);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.38), 0 18px 34px rgba(184,146,12,.25);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.09);
+      color: var(--text);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      backdrop-filter: blur(22px) saturate(160%);
+    }
+    .btn-danger {
+      color: white;
+      background: linear-gradient(180deg, #D81436, #7E0E1D);
+    }
+    .btn-block { width: 100%; }
+    .btn-icon { width: 46px; padding: 0; }
 
-/* Back */
-.card-back{background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(255,255,255,.07) 0%,transparent 60%),linear-gradient(135deg,#c0192b 0%,#8a0015 50%,#c0192b 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border:1px solid rgba(255,255,255,.13);border-top-color:rgba(255,255,255,.28)}
-.cb-inner{position:absolute;inset:12px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0px,rgba(255,255,255,.04) 1px,transparent 1px,transparent 11px),repeating-linear-gradient(-45deg,rgba(255,255,255,.04) 0px,rgba(255,255,255,.04) 1px,transparent 1px,transparent 11px)}
-.cb-suits{font-size:1.7rem;line-height:1.5;text-align:center;opacity:.24;position:relative;z-index:1}
-.cb-hint{font-size:.6rem;letter-spacing:.2em;color:rgba(255,255,255,.5);text-transform:uppercase;position:relative;z-index:1}
+    .player-list { display: grid; gap: 9px; }
+    .person-row {
+      min-height: 58px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border-radius: 18px;
+      animation: rowIn .36s var(--spring) both;
+      animation-delay: calc(var(--i, 0) * 36ms);
+      contain: layout paint style;
+    }
+    @keyframes rowIn {
+      from { opacity: 0; transform: translate3d(0, 12px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    .row-num {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      color: var(--gold-hot);
+      font-weight: 700;
+      font-size: .84rem;
+    }
+    .player-name {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+    .skeleton { height: 58px; border-radius: 18px; background: linear-gradient(90deg, rgba(255,255,255,.035), rgba(255,255,255,.07), rgba(255,255,255,.035)); opacity: .55; }
 
-/* Front */
-.card-front{transform:rotateY(180deg);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border:1px solid rgba(255,255,255,.12)}
-.cf-light{background:linear-gradient(160deg,#faf5ec 0%,#f0e8d4 100%)}
-.cf-dark{background:linear-gradient(160deg,#f0ece8 0%,#e4ddd6 100%)}
-.cf-gold{background:linear-gradient(160deg,#0c0a06 0%,#1a1508 100%);border-color:rgba(201,149,76,.32)!important}
-.cf-corner{position:absolute;font-family:'Cormorant Garamond',serif;font-size:.9rem;font-weight:700;line-height:1.3;text-align:center}
-.cf-corner.tl{top:10px;left:12px} .cf-corner.br{bottom:10px;right:12px;transform:rotate(180deg)}
-.cf-center{display:flex;flex-direction:column;align-items:center;gap:4px}
-.cf-val{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:900;line-height:.9}
-.cf-suit{font-size:2rem;line-height:1}
-.cf-rlabel{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;margin-top:8px;opacity:.38;font-family:'Outfit',sans-serif;font-weight:600}
-.cf-light .cf-corner,.cf-light .cf-center{color:#c01230}
-.cf-dark .cf-corner,.cf-dark .cf-center{color:#1c1510}
-.cf-gold .cf-corner,.cf-gold .cf-center{color:var(--gold)}
+    .config-list { display: grid; gap: 10px; }
+    .config-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 62px;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .config-name { font-weight: 700; }
+    .config-meta { margin-top: 3px; color: var(--text-2); font-size: .76rem; }
+    .stepper { display: grid; grid-template-columns: 38px 34px 38px; align-items: center; gap: 4px; }
+    .stepper button {
+      height: 38px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      display: grid;
+      place-items: center;
+    }
+    .stepper svg { width: 17px; height: 17px; }
+    .stepper-value { text-align: center; color: var(--text); font-weight: 800; }
+    .toggle {
+      width: 58px;
+      height: 34px;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.09);
+      transition: background .2s var(--steady), border-color .2s var(--steady);
+    }
+    .toggle span {
+      display: block;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(226,214,192,.88);
+      transition: transform .28s var(--spring), background .2s var(--steady);
+      box-shadow: 0 4px 14px rgba(0,0,0,.32);
+    }
+    .toggle.on { background: rgba(184,146,12,.32); border-color: rgba(212,170,20,.44); }
+    .toggle.on span { transform: translate3d(24px,0,0); background: #F3D46E; }
 
-@keyframes dealIn{from{opacity:0;transform:translateY(-55px) scale(.88) rotate(-4deg)}to{opacity:1;transform:translateY(0) scale(1) rotate(0deg)}}
-.card-deal{animation:dealIn .58s var(--spring) forwards}
+    .validation {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 50px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      font-size: .84rem;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      margin-bottom: 14px;
+    }
+    .validation.ok { color: #A8E8BF; border-color: rgba(34,176,96,.22); }
+    .validation.warn { color: #E5C15A; border-color: rgba(212,170,20,.22); }
+    .validation.err { color: #FF8EA0; border-color: rgba(216,20,54,.28); }
 
-/* ── REVEAL SCREEN ───────────────────────────── */
-.reveal-screen{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:calc(44px + var(--sat)) 24px calc(64px + var(--sab));position:relative}
-.rev-glow{position:absolute;width:320px;height:320px;border-radius:50%;filter:blur(90px);opacity:.22;pointer-events:none;z-index:0;transition:all .6s ease}
-.rev-count{font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;color:var(--t3);margin-bottom:6px;position:relative;z-index:1}
-.rev-name{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:700;margin-bottom:34px;text-align:center;position:relative;z-index:1}
-.rev-card-wrap{margin-bottom:38px;position:relative;z-index:1}
-.rev-hint{font-size:.74rem;color:var(--t3);text-align:center;margin-bottom:28px;position:relative;z-index:1}
-.rev-actions{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-.fade-up{animation:fadeUp .38s var(--out) forwards}
+    .header {
+      position: sticky;
+      top: calc(var(--safe-top) + 8px);
+      z-index: 7;
+      border-radius: 24px;
+      padding: 14px;
+      margin-bottom: 14px;
+      transform: translateZ(0);
+    }
+    .header-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .title {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 2rem;
+      line-height: 1;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+    .subtitle { margin-top: 5px; color: var(--text-2); font-size: .82rem; }
+    .phase-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 32px;
+      padding: 0 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.09);
+      background: rgba(255,255,255,.045);
+      color: var(--text);
+      font-weight: 800;
+      font-size: .73rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .phase-pill svg { width: 15px; height: 15px; }
 
-/* ── GAME HEADER ─────────────────────────────── */
-.game-header{position:sticky;top:0;z-index:10;padding:calc(13px + var(--sat)) 20px 12px;background:rgba(3,3,10,.62);backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%);border-bottom:1px solid rgba(255,255,255,.055)}
-.gh-inner{max-width:480px;margin:0 auto}
-.gh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
-.gh-title{font-family:'Cormorant Garamond',serif;font-size:1.14rem;font-weight:700}
-.phase-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:.69rem;font-weight:500;letter-spacing:.03em}
-.pill-day{background:rgba(201,149,76,.1);color:var(--gold);border:1px solid rgba(201,149,76,.2)}
-.pill-night{background:rgba(100,80,180,.1);color:#a090e0;border:1px solid rgba(100,80,180,.2)}
-.pill-dawn{background:rgba(232,150,80,.1);color:#e8a060;border:1px solid rgba(232,150,80,.2)}
-.gh-sub{font-size:.71rem;color:var(--t3)}
+    .bottom-actions {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 8;
+      padding: 12px 14px calc(var(--safe-bottom) + 12px);
+      background: linear-gradient(180deg, transparent, rgba(7,5,13,.88) 30%, rgba(7,5,13,.98));
+      pointer-events: none;
+    }
+    .bottom-inner {
+      width: min(100%, 560px);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      pointer-events: auto;
+    }
+    .bottom-inner.single { grid-template-columns: 1fr; }
 
-/* Step dots */
-.sdots{display:flex;gap:5px;align-items:center;margin-top:6px}
-.sdot{height:5px;width:5px;border-radius:3px;background:rgba(255,255,255,.11);transition:all .25s var(--spring)}
-.sdot.done{background:rgba(46,204,130,.45)}
-.sdot.active{width:20px;background:var(--red2);box-shadow:0 0 6px var(--red-g)}
+    .fab {
+      position: fixed;
+      right: 18px;
+      bottom: calc(var(--safe-bottom) + 86px);
+      z-index: 9;
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      transform: translateZ(0);
+    }
+    .fab svg { width: 23px; height: 23px; }
+    body.night .fab { animation: pulseRed 1.5s ease-in-out infinite; }
+    @keyframes pulseRed {
+      0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 0 0 rgba(216,20,54,0), 0 18px 44px rgba(0,0,0,.5); }
+      50% { box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 0 34px rgba(216,20,54,.36), 0 18px 44px rgba(0,0,0,.5); }
+    }
 
-/* ── PLAYER CARDS (Game) ─────────────────────── */
-.gp{display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:16px;cursor:pointer;transition:all .14s var(--spring);background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--gb);border-top-color:rgba(255,255,255,.1);box-shadow:var(--sh-sm);margin-bottom:7px;position:relative;overflow:hidden}
-.gp::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gb-hi),transparent)}
-.gp:active{transform:scale(.97);background:var(--g2)}
-.gp.dead{opacity:.25;cursor:default;filter:grayscale(.6)} .gp.dead:active{transform:none}
-.gp.no-tap{cursor:default} .gp.no-tap:active{transform:none}
-.gp.sel{border-color:rgba(192,25,43,.5);background:rgba(192,25,43,.08);box-shadow:0 0 0 1px rgba(192,25,43,.28),var(--sh-sm)}
-.rpip{width:40px;height:52px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.35)}
-.rpip.red{background:linear-gradient(160deg,#faf5ec,#f0e4cc);color:#c01230}
-.rpip.black{background:linear-gradient(160deg,#f0ece8,#e0d8d0);color:#1c1510}
-.rpip.gold{background:linear-gradient(160deg,#0c0a06,#1a1508);color:var(--gold);border:1px solid rgba(201,149,76,.28)}
-.pip-v{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:900;line-height:1}
-.pip-s{font-size:.7rem;line-height:1.2}
-.gp-info{flex:1;min-width:0}
-.gp-name{font-size:.91rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gp-role{font-size:.7rem;color:var(--t3);margin-top:2px}
-.gp-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
-.badge{font-size:.59rem;padding:2px 7px;border-radius:5px;font-weight:600;letter-spacing:.04em}
-.b-mute{background:rgba(200,80,30,.14);color:#e09060;border:1px solid rgba(200,80,30,.2)}
-.b-novote{background:rgba(80,100,200,.14);color:#8090d0;border:1px solid rgba(80,100,200,.2)}
-.b-promo{background:rgba(201,149,76,.14);color:var(--gold);border:1px solid rgba(201,149,76,.22)}
-.gp-ck{color:var(--town);font-size:1.05rem;flex-shrink:0}
+    .reveal-screen {
+      min-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 60px);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      text-align: center;
+      position: relative;
+    }
+    .reveal-name {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 2.35rem;
+      font-weight: 700;
+      line-height: 1;
+      overflow-wrap: anywhere;
+    }
+    .reveal-count { color: var(--text-2); font-size: .8rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+    .reveal-hint { color: var(--text-2); font-size: .9rem; line-height: 1.4; }
+    .card-scene {
+      width: min(70vw, 286px);
+      max-width: 100%;
+      aspect-ratio: 5 / 7;
+      margin: 0 auto;
+      perspective: 1300px;
+      contain: layout paint style;
+    }
+    .playing-card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      transform-style: preserve-3d;
+      transition: transform .72s var(--spring);
+      will-change: transform;
+      transform: translateZ(0);
+    }
+    .playing-card.flipped { transform: rotateY(180deg) translateZ(0); }
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      backface-visibility: hidden;
+      overflow: hidden;
+      box-shadow: 0 28px 70px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.42);
+    }
+    .card-back {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.16), transparent 22%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,.08) 0 2px, transparent 2px 9px),
+        linear-gradient(145deg, #220711, #900F24 48%, #190813);
+      border: 9px solid #E8D9B7;
+    }
+    .card-back::before {
+      content: "";
+      position: absolute;
+      inset: 13px;
+      border: 1px solid rgba(232,217,183,.72);
+      border-radius: 10px;
+    }
+    .card-back-mark {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: rgba(255,248,226,.88);
+      text-shadow: 0 8px 26px rgba(0,0,0,.45);
+    }
+    .card-front {
+      transform: rotateY(180deg);
+      background:
+        radial-gradient(circle at 50% 48%, rgba(184,146,12,.12), transparent 30%),
+        linear-gradient(155deg, #FFF8EA, var(--paper));
+      color: var(--ink);
+      border: 1px solid rgba(55,37,23,.2);
+    }
+    .card-front.mafia { background: linear-gradient(155deg, #2A1014, #0E0B12); color: #F0E7D4; border-color: rgba(216,20,54,.34); }
+    .card-front.neutral { background: linear-gradient(155deg, #FFF8EA, #EAD7B7); color: #22170B; }
+    .card-corner {
+      position: absolute;
+      left: 14px;
+      top: 12px;
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-weight: 700;
+      font-size: 1.24rem;
+      line-height: .88;
+      text-align: center;
+    }
+    .card-corner.br { left: auto; top: auto; right: 14px; bottom: 12px; transform: rotate(180deg); }
+    .card-center {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 36px;
+    }
+    .card-value { font-family: "Cormorant Garamond", Georgia, serif; font-size: 5.1rem; font-weight: 700; line-height: .72; }
+    .card-suit { margin-top: 10px; font-family: "Cormorant Garamond", Georgia, serif; font-size: 2.2rem; line-height: 1; color: currentColor; }
+    .card-role { margin-top: 16px; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .16em; color: currentColor; opacity: .78; }
+    .red-pip { color: #A81124; }
+    .black-pip { color: currentColor; }
+    .gold-pip { color: var(--gold-hot); }
 
-/* ── NIGHT STEP ──────────────────────────────── */
-.step-card{border-radius:20px;padding:24px 20px;text-align:center;margin-bottom:16px;background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--gb);border-top-color:var(--gb-hi);box-shadow:var(--sh-md),inset 0 1px 0 var(--gb-hi);animation:fadeUp .34s var(--out) forwards}
-.step-icon{font-size:2.8rem;margin-bottom:10px}
-.step-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;margin-bottom:6px}
-.step-desc{font-size:.8rem;color:var(--t2);line-height:1.6}
-.step-result{margin-top:13px;padding:11px 14px;border-radius:11px;font-size:.84rem;font-weight:500}
-.sres-ok{background:var(--town-d);color:var(--town);border:1px solid rgba(46,204,130,.2)}
-.sres-bad{background:var(--red-d);color:var(--red2);border:1px solid rgba(232,32,58,.2)}
-.ac-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
-.ac-btn{padding:16px 12px;border-radius:14px;text-align:center;cursor:pointer;transition:all .14s var(--spring);background:var(--g1);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--gb);box-shadow:var(--sh-sm)}
-.ac-btn:active{transform:scale(.96)}
-.ac-btn.sel{border-color:rgba(192,25,43,.42);background:rgba(192,25,43,.09);box-shadow:0 0 0 1px rgba(192,25,43,.22),var(--sh-sm)}
-.ac-icon{font-size:1.5rem;margin-bottom:6px}
-.ac-label{font-size:.87rem;font-weight:500;margin-bottom:2px}
-.ac-desc{font-size:.7rem;color:var(--t3)}
+    .role-pip {
+      width: 40px;
+      height: 50px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      background: linear-gradient(155deg, #FFF8EA, #EADBC3);
+      color: #1D1820;
+      box-shadow: 0 8px 20px rgba(0,0,0,.28);
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-weight: 700;
+      line-height: .8;
+      text-align: center;
+      border: 1px solid rgba(0,0,0,.12);
+    }
+    .role-pip.mafia { background: linear-gradient(155deg, #291016, #0D0A12); color: #F0E7D4; border-color: rgba(216,20,54,.32); }
+    .pip-suit { display: block; margin-top: 4px; font-size: 1.05rem; }
 
-/* ── RESOLUTION ──────────────────────────────── */
-@keyframes evSlide{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:translateX(0)}}
-.res-ev{display:flex;align-items:flex-start;gap:13px;padding:14px 16px;border-radius:15px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);margin-bottom:8px;animation:evSlide .4s var(--out) forwards;opacity:0}
-.rev-death{background:rgba(192,25,43,.09);border:1px solid rgba(192,25,43,.22)}
-.rev-save{background:var(--town-d);border:1px solid rgba(46,204,130,.2)}
-.rev-info{background:var(--g1);border:1px solid var(--gb)}
-.rev-tort{background:var(--gold-d);border:1px solid rgba(201,149,76,.2)}
-.rev-dok{background:var(--town-d);border:1px solid rgba(46,204,130,.2)}
-.rev-dbad{background:var(--red-d);border:1px solid rgba(232,32,58,.2)}
-.rev-icon{font-size:1.3rem;flex-shrink:0;margin-top:1px}
-.rev-title{font-size:.88rem;font-weight:600;margin-bottom:3px}
-.rev-msg{font-size:.78rem;color:var(--t2);line-height:1.5}
+    .game-row {
+      min-height: 70px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      transition: transform .18s var(--spring), border-color .18s var(--steady), background .18s var(--steady);
+      animation: rowIn .36s var(--spring) both;
+      animation-delay: calc(var(--i, 0) * 36ms);
+      contain: layout paint style;
+    }
+    .game-row:active { transform: scale(.985) translateZ(0); }
+    .game-row.dead { opacity: .48; filter: grayscale(.5); }
+    .game-row.selected { border-color: rgba(212,170,20,.5); background: rgba(212,170,20,.10); }
+    .row-sub { margin-top: 5px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: var(--text-2); font-size: .78rem; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 22px;
+      padding: 0 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--text);
+      font-size: .68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .badge svg { width: 12px; height: 12px; }
+    .badge.red { color: #FFB2BF; border-color: rgba(216,20,54,.28); }
+    .badge.gold { color: #F2D779; border-color: rgba(212,170,20,.28); }
+    .badge.green { color: #A6E8BD; border-color: rgba(34,176,96,.25); }
+    .row-check { color: var(--gold-hot); }
+    .row-check svg { width: 24px; height: 24px; }
 
-/* ── MODAL ───────────────────────────────────── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:100;display:flex;align-items:flex-end;animation:ovIn .2s ease forwards}
-@keyframes ovIn{from{opacity:0}to{opacity:1}}
-.modal-sheet{width:100%;max-width:480px;margin:0 auto;background:rgba(8,7,20,.96);backdrop-filter:blur(44px) saturate(180%);-webkit-backdrop-filter:blur(44px) saturate(180%);border:1px solid var(--gb);border-top-color:var(--gb-hi);border-radius:26px 26px 0 0;padding:18px 22px calc(20px + var(--sab));box-shadow:0 -8px 40px rgba(0,0,0,.5);animation:sheetUp .3s var(--spring) forwards}
-@keyframes sheetUp{from{transform:translateY(44px);opacity:.5}to{transform:translateY(0);opacity:1}}
-.modal-handle{width:36px;height:4px;background:rgba(255,255,255,.14);border-radius:2px;margin:0 auto 18px}
-.modal-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;margin-bottom:5px}
-.modal-sub{font-size:.8rem;color:var(--t2);margin-bottom:20px;line-height:1.55}
+    .boneyard { margin-top: 18px; }
+    .progress-dots { display: flex; gap: 7px; margin-top: 12px; }
+    .dot {
+      height: 6px;
+      flex: 1;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      overflow: hidden;
+    }
+    .dot.done, .dot.active { background: rgba(212,170,20,.38); }
+    .dot.active { box-shadow: 0 0 18px rgba(212,170,20,.38); }
 
-/* ── BOTTOM BAR ──────────────────────────────── */
-.bottom-bar-outer{position:fixed;bottom:0;left:0;right:0;z-index:10;background:rgba(3,3,10,.72);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);border-top:1px solid rgba(255,255,255,.055)}
-.bottom-bar{max-width:480px;margin:0 auto;padding:12px 16px calc(12px + var(--sab));display:flex;gap:8px}
+    .step-card {
+      position: relative;
+      border-radius: 28px;
+      padding: 18px;
+      margin-bottom: 14px;
+      isolation: isolate;
+    }
+    .step-card::after {
+      content: "";
+      position: absolute;
+      inset: -30px -20px auto;
+      height: 180px;
+      background: radial-gradient(circle at 50% 0%, var(--glow, rgba(212,170,20,.14)), transparent 68%);
+      opacity: .95;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .step-title {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .step-copy { color: var(--text-2); line-height: 1.42; margin-top: 8px; }
+    .script-box {
+      margin-top: 14px;
+      border-radius: 18px;
+      padding: 13px;
+      color: #F3D67E;
+      background: rgba(184,146,12,.10);
+      border: 1px solid rgba(212,170,20,.24);
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 1.1rem;
+      line-height: 1.35;
+    }
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .action-tile {
+      min-height: 88px;
+      border-radius: 20px;
+      padding: 12px;
+      text-align: left;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      transition: transform .18s var(--spring), border-color .18s var(--steady), background .18s var(--steady);
+    }
+    .action-tile:active { transform: scale(.98); }
+    .action-tile.selected { border-color: rgba(212,170,20,.46); background: rgba(212,170,20,.11); }
+    .action-tile svg { width: 22px; height: 22px; color: var(--gold-hot); }
+    .action-title { margin-top: 8px; font-weight: 800; }
+    .action-sub { margin-top: 3px; color: var(--text-2); font-size: .76rem; line-height: 1.25; }
+    .hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      color: #F3D67E;
+      background: rgba(184,146,12,.10);
+      border: 1px solid rgba(212,170,20,.22);
+      font-size: .82rem;
+      font-weight: 700;
+    }
+    .hint svg { width: 16px; height: 16px; }
+    .result-card {
+      margin-top: 12px;
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .result-card.good { color: #B7F2CB; background: rgba(34,176,96,.11); }
+    .result-card.bad { color: #FFB4C0; background: rgba(216,20,54,.12); }
+    .result-card svg { width: 21px; height: 21px; }
 
-/* ── GAME OVER ───────────────────────────────── */
-.go-screen{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:calc(52px + var(--sat)) 20px calc(64px + var(--sab))}
-.go-badge{font-size:5.5rem;margin-bottom:18px;animation:badgePop .62s var(--spring) .1s both}
-@keyframes badgePop{from{opacity:0;transform:scale(.5) rotate(-10deg)}to{opacity:1;transform:scale(1) rotate(0)}}
-.go-winner{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:900;text-align:center;margin-bottom:6px}
-.go-winner.tw{color:var(--town);text-shadow:0 0 40px rgba(46,204,130,.38)}
-.go-winner.mf{color:var(--red2);text-shadow:0 0 40px var(--red-g)}
-.go-sub{font-size:.88rem;color:var(--t2);margin-bottom:32px;text-align:center}
-.go-sec{width:100%;margin-bottom:22px}
+    .event-list { display: grid; gap: 10px; }
+    .event-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 13px;
+      border-radius: 20px;
+      animation: rowIn .38s var(--spring) both;
+      animation-delay: calc(var(--i, 0) * 70ms);
+    }
+    .event-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.06);
+    }
+    .event-icon svg { width: 20px; height: 20px; }
+    .event-title { font-weight: 800; }
+    .event-msg { margin-top: 4px; color: var(--text-2); font-size: .82rem; line-height: 1.35; }
+    .event-row.death .event-icon { color: #FFB2BF; background: rgba(216,20,54,.14); }
+    .event-row.save .event-icon { color: #A8E8BF; background: rgba(34,176,96,.14); }
+    .event-row.info .event-icon { color: #BFD0FF; background: rgba(104,136,208,.14); }
+    .event-row.torture .event-icon { color: #F2D779; background: rgba(184,146,12,.13); }
 
-/* ── SKELETON ────────────────────────────────── */
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.skel{background:linear-gradient(90deg,rgba(255,255,255,.03) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.03) 75%);background-size:200% 100%;animation:shimmer 1.7s ease-in-out infinite;border-radius:16px;margin-bottom:7px}
+    .team-section { margin-top: 16px; }
+    .winner-mark {
+      width: 76px;
+      height: 76px;
+      display: grid;
+      place-items: center;
+      margin: 30px auto 14px;
+      border-radius: 26px;
+      color: white;
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 24px 70px rgba(0,0,0,.48);
+    }
+    .winner-mark svg { width: 38px; height: 38px; }
+    .winner-title {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      text-align: center;
+      font-size: 3.2rem;
+      line-height: .95;
+      font-weight: 700;
+    }
+    .winner-copy { margin: 10px auto 18px; max-width: 320px; color: var(--text-2); text-align: center; line-height: 1.42; }
 
-/* ── UTILS ───────────────────────────────────── */
-.divider{height:1px;background:rgba(255,255,255,.05);margin:14px 0}
-.mt8{margin-top:8px} .mt12{margin-top:12px} .mt16{margin-top:16px} .mt20{margin-top:20px} .mt24{margin-top:24px}
-.mb8{margin-bottom:8px} .mb12{margin-bottom:12px} .mb16{margin-bottom:16px}
-.flex{display:flex} .flex-1{flex:1} .gap8{gap:8px} .gap12{gap:12px}
-.tc{text-align:center} .tdim{color:var(--t2);font-size:.8rem} .tred{color:var(--red2)} .tgold{color:var(--gold)} .tgreen{color:var(--town)}
-</style>
-</head>
-<body>
-<div class="bg day" id="bg"></div>
-<div id="app"></div>
-<div id="mc"></div>
+    #modal-root, #toast-root { position: fixed; z-index: 30; inset: 0; pointer-events: none; }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      align-items: end;
+      background: rgba(0,0,0,.48);
+      pointer-events: auto;
+      animation: fadeIn .2s var(--steady) both;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .sheet {
+      width: min(100%, 600px);
+      max-height: min(84dvh, 780px);
+      overflow: hidden;
+      margin: 0 auto;
+      border-radius: 30px 30px 0 0;
+      padding: 12px 14px calc(var(--safe-bottom) + 16px);
+      animation: sheetIn .42s var(--spring) both;
+      will-change: transform;
+      transform: translateZ(0);
+      pointer-events: auto;
+      touch-action: pan-y;
+    }
+    @keyframes sheetIn {
+      from { transform: translate3d(0, 100%, 0); }
+      to { transform: translate3d(0, 0, 0); }
+    }
+    .sheet-handle {
+      width: 48px;
+      height: 5px;
+      border-radius: 999px;
+      margin: 0 auto 14px;
+      background: rgba(255,255,255,.18);
+    }
+    .sheet-title {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .sheet-body {
+      max-height: calc(84dvh - 120px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 2px 2px 10px;
+      overscroll-behavior: contain;
+    }
+    .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+    .tab {
+      min-height: 40px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.08);
+      font-weight: 800;
+      color: var(--text-2);
+    }
+    .tab.active { color: var(--text); background: rgba(212,170,20,.12); border-color: rgba(212,170,20,.28); }
+    .count-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+    .count-box { border-radius: 16px; padding: 10px; text-align: center; background: rgba(0,0,0,.18); border: 1px solid rgba(255,255,255,.06); }
+    .count-num { font-weight: 900; font-size: 1.2rem; }
+    .count-label { margin-top: 3px; color: var(--text-2); font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; }
 
-<script>
-// ============================================================
-// ROLE DEFINITIONS
-// ============================================================
-const ROLES = {
-  killer:   { label:'Killer',    val:'K',  suit:'♠', pip:'black', team:'mafia',   cs:'cf-dark'  },
-  torturer: { label:'Torturer',  val:'T',  suit:'♣', pip:'black', team:'mafia',   cs:'cf-dark'  },
-  whore:    { label:'Whore',     val:'Q',  suit:'♥', pip:'red',   team:'neutral', cs:'cf-light' },
-  detective:{ label:'Detective', val:'J',  suit:'♦', pip:'red',   team:'town',    cs:'cf-light' },
-  doctor:   { label:'Doctor',    val:'10', suit:'♥', pip:'red',   team:'town',    cs:'cf-light' },
-  joker:    { label:'Joker',     val:'★',  suit:'✦', pip:'gold',  team:'neutral', cs:'cf-gold'  },
-  civilian: { label:'Civilian',  val:'2',  suit:'♠', pip:'black', team:'town',    cs:'cf-dark'  },
-};
+    .undo {
+      position: fixed;
+      left: 14px;
+      right: 14px;
+      bottom: calc(var(--safe-bottom) + 14px);
+      width: min(calc(100% - 28px), 560px);
+      margin: 0 auto;
+      border-radius: 20px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      pointer-events: auto;
+      animation: rowIn .28s var(--spring) both;
+    }
+    .undo-text { font-weight: 800; font-size: .85rem; }
+    .undo-sub { margin-top: 3px; color: var(--text-2); font-size: .74rem; }
+    .undo-progress {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      background: var(--gold-hot);
+      transform-origin: left;
+      animation: undoDrain 5s linear forwards;
+    }
+    @keyframes undoDrain { to { transform: scaleX(0); } }
 
-// ============================================================
-// STATE
-// ============================================================
-let G = {
-  screen:'setup', players:[], config:{killers:1,torturers:0,doctors:0,detectives:0,whore:false,joker:false},
-  revealIdx:0, cardFlipped:false, round:1, phase:'day',
-  nightSteps:[], nightStepIdx:0, nightActions:{}, torturerAction:null,
-  resolution:[], gameResult:null, torturerPromoted:false,
-};
-let nameInput = '';
-let modalPlayerId = null;
-let _trans = false;
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
 
-// ============================================================
-// HELPERS
-// ============================================================
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function alive(){return G.players.filter(p=>p.alive)}
-function aliveRole(r){return G.players.filter(p=>p.alive&&p.role===r)}
-function getP(id){return G.players.find(p=>p.id===id)}
-function activeKillerIds(){return G.players.filter(p=>p.alive&&(p.role==='killer'||(p.role==='torturer'&&p.promoted))).map(p=>p.id)}
-function totalRoles(){const c=G.config;return c.killers+c.torturers+c.doctors+c.detectives+(c.whore?1:0)+(c.joker?1:0)}
-function civCount(){return Math.max(0,G.players.length-totalRoles())}
-function isValid(){return G.players.length>=3&&G.config.killers>=1&&totalRoles()<=G.players.length}
-function valMsg(){
-  if(!G.players.length) return{t:'warn',msg:'Add at least 3 players.'};
-  if(G.players.length<3) return{t:'err',msg:`Need at least 3 players (have ${G.players.length}).`};
-  if(G.config.killers<1) return{t:'err',msg:'Need at least 1 Killer.'};
-  if(totalRoles()>G.players.length) return{t:'err',msg:`${totalRoles()} roles but only ${G.players.length} players.`};
-  const c=civCount();
-  return{t:'ok',msg:`Ready! ${c} Civilian${c!==1?'s':''} will fill remaining spots.`};
-}
-
-// ============================================================
-// TRANSITION SYSTEM
-// ============================================================
-function goTo(renderFn, bgClass='day'){
-  if(_trans) return;
-  _trans = true;
-  const app = document.getElementById('app');
-  app.classList.add('out');
-  document.getElementById('bg').className = 'bg '+bgClass;
-  setTimeout(()=>{
-    app.innerHTML = renderFn();
-    requestAnimationFrame(()=>{
-      app.classList.remove('out');
-      _trans = false;
-    });
-    bindEv();
-  }, 230);
-}
-
-// ============================================================
-// SETUP ACTIONS
-// ============================================================
-function addPlayer(name){
-  name=(name||'').trim();
-  if(!name) return;
-  G.players.push({id:uid(),name,role:null,alive:true,canTalk:true,canVote:true,promoted:false});
-  nameInput='';
-  render();
-  setTimeout(()=>{const el=document.getElementById('ni');if(el){el.value='';el.focus();}},30);
-}
-function removePlayer(id){G.players=G.players.filter(p=>p.id!==id);render()}
-function setConfig(key,val){G.config[key]=val;render()}
-
-function startGame(){
-  if(!isValid()) return;
-  const pool=[];
-  for(let i=0;i<G.config.killers;i++) pool.push('killer');
-  for(let i=0;i<G.config.torturers;i++) pool.push('torturer');
-  for(let i=0;i<G.config.doctors;i++) pool.push('doctor');
-  for(let i=0;i<G.config.detectives;i++) pool.push('detective');
-  if(G.config.whore) pool.push('whore');
-  if(G.config.joker) pool.push('joker');
-  while(pool.length<G.players.length) pool.push('civilian');
-  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
-  G.players.forEach((p,i)=>{p.role=pool[i];p.alive=true;p.canTalk=true;p.canVote=true;p.promoted=false;});
-  G.revealIdx=0; G.cardFlipped=false; G.screen='reveal';
-  goTo(renderReveal, 'night');
-}
-
-// ============================================================
-// REVEAL ACTIONS
-// ============================================================
-function flipCard(){G.cardFlipped=true;render()}
-function nextReveal(){
-  G.revealIdx++; G.cardFlipped=false;
-  if(G.revealIdx>=G.players.length){G.screen='game';G.phase='day';G.round=1;resetNight();goTo(renderDay,'day');}
-  else render();
-}
-
-// ============================================================
-// NIGHT SETUP
-// ============================================================
-function resetNight(){
-  G.nightActions={jokerAwoke:false,jokerSugg:null,killTarget:null,tortTarget:null,tortAction:null,whoreTarget:null,doctorSave:null,detectCheck:null};
-  G.torturerAction=null;
-}
-function buildSteps(){
-  const s=[];
-  if(aliveRole('joker').length>0) s.push({id:'joker',icon:'🃏',title:'The Joker'});
-  if(activeKillerIds().length>0) s.push({id:'kill',icon:'🔪',title:'Killers Wake Up'});
-  if(aliveRole('torturer').length>0&&!G.torturerPromoted) s.push({id:'torturer',icon:'🔧',title:'Torturer Wakes Up'});
-  if(aliveRole('whore').length>0) s.push({id:'whore',icon:'♥',title:'The Whore'});
-  if(aliveRole('doctor').length>0) s.push({id:'doctor',icon:'💊',title:'Doctor Wakes Up'});
-  if(aliveRole('detective').length>0) s.push({id:'detective',icon:'🔍',title:'Detective Wakes Up'});
-  return s;
-}
-function startNight(){
-  G.players.forEach(p=>{p.canTalk=true;p.canVote=true;});
-  G.phase='night'; resetNight();
-  G.nightSteps=buildSteps(); G.nightStepIdx=0;
-  if(!G.nightSteps.length){resolveNight();return;}
-  goTo(renderNight,'night');
-}
-function curStep(){return G.nightSteps[G.nightStepIdx]||null}
-
-// ============================================================
-// NIGHT ACTIONS
-// ============================================================
-function nightPick(id){
-  const step=curStep(); if(!step) return;
-  const a=G.nightActions;
-  switch(step.id){
-    case 'joker': if(!a.jokerAwoke) return; a.jokerSugg=a.jokerSugg===id?null:id; break;
-    case 'kill': a.killTarget=a.killTarget===id?null:id; break;
-    case 'torturer': if(!G.torturerAction) return; a.tortTarget=a.tortTarget===id?null:id; a.tortAction=G.torturerAction; break;
-    case 'whore': a.whoreTarget=a.whoreTarget===id?null:id; break;
-    case 'doctor': a.doctorSave=a.doctorSave===id?null:id; break;
-    case 'detective': a.detectCheck=a.detectCheck===id?null:id; break;
-  }
-  render();
-}
-function toggleJoker(){G.nightActions.jokerAwoke=!G.nightActions.jokerAwoke;if(!G.nightActions.jokerAwoke)G.nightActions.jokerSugg=null;render()}
-function pickTortAction(act){G.torturerAction=G.torturerAction===act?null:act;G.nightActions.tortAction=G.torturerAction;G.nightActions.tortTarget=null;render()}
-function nextStep(){G.nightStepIdx++;G.torturerAction=null;if(G.nightStepIdx>=G.nightSteps.length)resolveNight();else render()}
-function skipStep(){
-  const step=curStep(); if(!step) return;
-  const a=G.nightActions;
-  switch(step.id){
-    case 'joker': a.jokerAwoke=false;a.jokerSugg=null;break;
-    case 'kill': a.killTarget=null;break;
-    case 'torturer': a.tortTarget=null;a.tortAction=null;break;
-    case 'whore': a.whoreTarget=null;break;
-    case 'doctor': a.doctorSave=null;break;
-    case 'detective': a.detectCheck=null;break;
-  }
-  G.torturerAction=null; G.nightStepIdx++;
-  if(G.nightStepIdx>=G.nightSteps.length) resolveNight(); else render();
-}
-
-// ============================================================
-// NIGHT RESOLUTION
-// ============================================================
-function resolveNight(){
-  const a=G.nightActions; const events=[];
-  const killerIds=activeKillerIds();
-  const whoreP=G.players.find(p=>p.alive&&p.role==='whore');
-  let killTarget=a.killTarget;
-  if(killTarget){
-    if(a.whoreTarget&&killerIds.includes(a.whoreTarget)){
-      events.push({cls:'rev-info',icon:'🃏',title:'No kill tonight',msg:'The Whore slept with the Killer — all night actions are cancelled.'});
-      killTarget=null;
-    } else {
-      const tgt=getP(killTarget);
-      const isWhore=whoreP&&killTarget===whoreP.id;
-      const isWhorePartner=whoreP&&killTarget===a.whoreTarget&&!isWhore;
-      if(isWhore){
-        if(a.doctorSave===whoreP.id){events.push({cls:'rev-save',icon:'💊',title:`${esc(whoreP.name)} saved`,msg:'Doctor protected the Whore. Her partner is also safe.'});}
-        else{killP(whoreP.id);events.push({cls:'rev-death',icon:'💀',title:`${esc(whoreP.name)} was killed`,msg:'The Whore was eliminated.'});
-          if(a.whoreTarget){const partner=getP(a.whoreTarget);if(partner&&partner.alive){killP(a.whoreTarget);events.push({cls:'rev-death',icon:'💀',title:`${esc(partner.name)} also dies`,msg:'They were with the Whore and share her fate.'});}}}
-      } else if(isWhorePartner){
-        if(a.doctorSave===killTarget){events.push({cls:'rev-save',icon:'💊',title:`${esc(tgt?.name)} saved`,msg:'Doctor saved the target. The Whore also survives.'});}
-        else{if(tgt)killP(killTarget);events.push({cls:'rev-death',icon:'💀',title:`${esc(tgt?.name)} was killed`,msg:"They were the Whore's bed partner."});
-          if(whoreP&&whoreP.alive){killP(whoreP.id);events.push({cls:'rev-death',icon:'💀',title:`${esc(whoreP.name)} also dies`,msg:'The Whore shared the fate of her partner.'});}}
-      } else {
-        if(a.doctorSave===killTarget){events.push({cls:'rev-save',icon:'💊',title:`${esc(tgt?.name)} saved`,msg:'The Doctor protected this player tonight.'});}
-        else{if(tgt)killP(killTarget);events.push({cls:'rev-death',icon:'💀',title:`${esc(tgt?.name)} was killed`,msg:'Eliminated by the Mafia.'});}
+    @media (min-width: 720px) {
+      #app { padding-top: calc(var(--safe-top) + 24px); }
+      .panel { padding: 18px; }
+      .sheet { border-radius: 30px; margin-bottom: 24px; padding-bottom: 18px; }
+    }
+    @media (max-width: 380px) {
+      .logo { font-size: 3.55rem; }
+      .title, .step-title, .sheet-title { font-size: 1.75rem; }
+      .player-name { font-size: 1.22rem; }
+      .btn { padding: 0 12px; font-size: .8rem; }
+      .card-value { font-size: 4.4rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+        scroll-behavior: auto !important;
       }
     }
-  } else events.push({cls:'rev-info',icon:'🌙',title:'Quiet night',msg:'No kill was made tonight.'});
+  </style>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+  <div id="stars" aria-hidden="true"></div>
+  <main id="app"></main>
+  <div id="modal-root"></div>
+  <div id="toast-root"></div>
 
-  if(a.tortTarget&&a.tortAction&&!G.torturerPromoted){
-    const tgt=getP(a.tortTarget);
-    if(tgt&&tgt.alive){
-      if(a.tortAction==='mouth'){tgt.canTalk=false;events.push({cls:'rev-tort',icon:'🤐',title:`${esc(tgt.name)} silenced`,msg:`${esc(tgt.name)} cannot speak during today's discussion.`});}
-      else{tgt.canVote=false;events.push({cls:'rev-tort',icon:'✋',title:`${esc(tgt.name)} restrained`,msg:`${esc(tgt.name)} cannot vote today.`});}
+  <script>
+    "use strict";
+
+    const ROLE = {
+      killer: { label: "Killer", value: "K", suit: "♠", team: "mafia", color: "black", night: "Kill one player." },
+      torturer: { label: "Torturer", value: "T", suit: "♣", team: "mafia", color: "black", night: "Silence or restrain one player." },
+      detective: { label: "Detective", value: "J", suit: "♦", team: "town", color: "red", night: "Investigate one suspect." },
+      doctor: { label: "Doctor", value: "10", suit: "♥", team: "town", color: "red", night: "Save one player." },
+      whore: { label: "Whore", value: "Q", suit: "♥", team: "neutral", color: "red", night: "Sleep with one player." },
+      joker: { label: "Joker", value: "★", suit: "★", team: "neutral", color: "gold", night: "Suggest a kill target." },
+      civilian: { label: "Civilian", value: "2", suit: "♠", team: "town", color: "black", night: "No night action." }
+    };
+
+    const TEAM_ORDER = [
+      { id: "mafia", label: "Mafia", roles: ["killer", "torturer"] },
+      { id: "town", label: "Town", roles: ["civilian", "detective", "doctor"] },
+      { id: "neutral", label: "Neutral", roles: ["whore", "joker"] }
+    ];
+
+    const STEP_META = {
+      joker: { title: "The Joker", icon: "mask", glow: "rgba(212,170,20,.15)", script: "Joker, open your eyes. Choose whether to wake. If you wake, point to one person you want the Mafia to notice." },
+      kill: { title: "Killers Wake", icon: "blade", glow: "rgba(216,20,54,.16)", script: "Killers, open your eyes together. Agree silently on one victim, then close your eyes." },
+      torturer: { title: "Torturer Wakes", icon: "bind", glow: "rgba(226,113,35,.15)", script: "Torturer, open your eyes. Choose mouth to silence or hands to block a vote. Point to the target." },
+      whore: { title: "The Whore", icon: "heart", glow: "rgba(238,93,140,.15)", script: "Whore, open your eyes. Choose who shares your bed tonight, then close your eyes." },
+      doctor: { title: "Doctor Wakes", icon: "shield", glow: "rgba(34,176,96,.15)", script: "Doctor, open your eyes. Choose one player to protect from death tonight." },
+      detective: { title: "Detective Wakes", icon: "search", glow: "rgba(104,136,208,.16)", script: "Detective, open your eyes. Point to one suspect. The narrator shows thumbs privately." }
+    };
+
+    const ICON = {
+      plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+      minus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg>',
+      x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+      check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+      users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+      cards: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="7" y="3" width="11" height="16" rx="2" transform="rotate(8 12.5 11)"/><rect x="4" y="5" width="11" height="16" rx="2" transform="rotate(-7 9.5 13)"/></svg>',
+      blade: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l6.5-6.5"/><path d="M13 14l7-7c.7-.7.3-2-1-2h-4l-5 5 4 4Z"/><path d="M7.5 16.5l-1-1"/></svg>',
+      skull: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 0-7 2.8-7 6.8 0 2.8 1.2 4.4 3 5.5V20h8v-4.7c1.8-1.1 3-2.7 3-5.5C19 5.8 16 3 12 3Z"/><path d="M9 10h.01M15 10h.01M10 16v4M14 16v4M12 14v2"/></svg>',
+      heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.6a5.1 5.1 0 0 0-7.2 0L12 7.2l-1.6-1.6a5.1 5.1 0 1 0-7.2 7.2L12 21l8.8-8.2a5.1 5.1 0 0 0 0-7.2Z"/></svg>',
+      shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-5"/></svg>',
+      search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
+      mask: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9c2.8-2 5.8-3 9-3s6.2 1 9 3l-2 7c-.6 2-2.4 3-4.2 2.3L12 17l-2.8 1.3C7.4 19 5.6 18 5 16L3 9Z"/><path d="M8 12h2M14 12h2"/><path d="M10 15c1.4.7 2.6.7 4 0"/></svg>',
+      eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
+      sleep: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a8 8 0 0 0 12 6 8.5 8.5 0 0 1-8-12A8 8 0 0 0 4 14Z"/><path d="M16 4h4l-4 5h4"/></svg>',
+      mouth: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12s3-4 8-4 8 4 8 4-3 4-8 4-8-4-8-4Z"/><path d="M5 5l14 14"/></svg>',
+      hand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12V5a2 2 0 0 1 4 0v6"/><path d="M12 11V4a2 2 0 0 1 4 0v8"/><path d="M16 12V7a2 2 0 0 1 4 0v7c0 5-3 8-8 8-3 0-5-1.4-6.8-4.2L3.6 15a2 2 0 0 1 3.3-2.2L8 14"/></svg>',
+      bind: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M17 7L7 17"/><circle cx="7" cy="7" r="3"/><circle cx="17" cy="17" r="3"/></svg>',
+      info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7h.01"/></svg>',
+      crown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l5 4 4-7 4 7 5-4-2 11H5L3 8Z"/><path d="M5 19h14"/></svg>',
+      sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>',
+      moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z"/></svg>',
+      panel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5M8 17h7"/></svg>',
+      log: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>',
+      thumbUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v10H4V10h3Z"/><path d="M7 10l5-7c1.5.4 2 1.7 1.3 3.3L12 9h6a2 2 0 0 1 2 2.3l-1 6A3 3 0 0 1 16 20H7"/></svg>',
+      thumbDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14V4H4v10h3Z"/><path d="M7 14l5 7c1.5-.4 2-1.7 1.3-3.3L12 15h6a2 2 0 0 0 2-2.3l-1-6A3 3 0 0 0 16 4H7"/></svg>'
+    };
+
+    const state = {
+      screen: "setup",
+      phase: "setup",
+      players: [],
+      config: { killers: 1, torturers: 0, doctors: 0, detectives: 0, whore: false, joker: false },
+      currentName: "",
+      revealIndex: 0,
+      cardFlipped: false,
+      round: 1,
+      torturerPromoted: false,
+      night: { steps: [], index: 0, actions: emptyActions() },
+      events: [],
+      history: [],
+      result: null,
+      modal: null,
+      narratorTab: "roles",
+      undo: null,
+      transitionKey: "setup"
+    };
+
+    let renderQueued = false;
+    let resetScrollNext = false;
+    let undoTimer = 0;
+    let audioCtx = null;
+    let wakeLock = null;
+    let wantsWakeLock = false;
+    let dragSheet = null;
+    let dragRaf = 0;
+
+    const app = document.getElementById("app");
+    const modalRoot = document.getElementById("modal-root");
+    const toastRoot = document.getElementById("toast-root");
+
+    function emptyActions() {
+      return {
+        jokerAwake: false,
+        jokerSuggestion: null,
+        killTarget: null,
+        tortureMode: null,
+        tortureTarget: null,
+        whoreTarget: null,
+        doctorActor: null,
+        doctorSave: null,
+        detectiveCheck: null
+      };
     }
-  }
-  if(a.detectCheck){
-    const tgt=getP(a.detectCheck);
-    if(tgt){
-      const isMafia=['killer','torturer'].includes(tgt.role);
-      events.push({cls:isMafia?'rev-dbad':'rev-dok',icon:isMafia?'👎':'👍',title:`${esc(tgt.name)}: ${isMafia?'MAFIA':'NOT mafia'}`,msg:isMafia?'Show thumbs DOWN to the Detective.':'Show thumbs UP to the Detective.'});
+
+    function uid() {
+      return "p_" + Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
     }
-  }
-  const promo=checkPromotion();
-  if(promo.length>0) events.push({cls:'rev-info',icon:'♛',title:'Succession',msg:`${promo.map(p=>esc(p.name)).join(', ')} takes the Killer's place.`});
-  G.resolution=events;
-  if(!checkWin()){G.phase='resolution';goTo(renderResolution,'night');}
-}
-function killP(id){const p=getP(id);if(p)p.alive=false;}
-function checkPromotion(){
-  if(G.torturerPromoted) return[];
-  const ka=G.players.filter(p=>p.alive&&p.role==='killer');
-  const ta=G.players.filter(p=>p.alive&&p.role==='torturer'&&!p.promoted);
-  if(ka.length===0&&ta.length>0){ta.forEach(t=>t.promoted=true);G.torturerPromoted=true;return ta;}
-  return[];
-}
-function checkWin(){
-  const ap=alive();
-  const ma=ap.filter(p=>p.role==='killer'||p.role==='torturer').length;
-  const ta=ap.filter(p=>['civilian','detective','doctor'].includes(p.role)).length;
-  if(ma===0){G.gameResult='town';G.screen='gameover';goTo(renderGameover,'over');return true;}
-  if(ma>=ta){G.gameResult='mafia';G.screen='gameover';goTo(renderGameover,'over-mafia');return true;}
-  return false;
-}
-function endResolution(){G.round++;G.phase='day';goTo(renderDay,'day')}
-function resetGame(){
-  G={screen:'setup',players:G.players.map(p=>({...p,role:null,alive:true,canTalk:true,canVote:true,promoted:false})),
-     config:{...G.config},revealIdx:0,cardFlipped:false,round:1,phase:'day',
-     nightSteps:[],nightStepIdx:0,nightActions:{},torturerAction:null,resolution:[],gameResult:null,torturerPromoted:false};
-  nameInput=''; goTo(renderSetup,'day');
-}
 
-// ============================================================
-// DAY ACTIONS
-// ============================================================
-function showElimModal(id){
-  modalPlayerId=id; const p=getP(id); if(!p) return;
-  const mc=document.getElementById('mc');
-  if(!mc) return;
-  mc.innerHTML=`<div class="modal-overlay" onclick="closeModal(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="modal-handle"></div>
-      <div class="modal-title">Eliminate ${esc(p.name)}?</div>
-      <div class="modal-sub">This removes them permanently. Their role will be revealed to all players.</div>
-      <div class="btn-row">
-        <button class="btn btn-glass" onclick="closeModalEl()">Cancel</button>
-        <button class="btn btn-danger" onclick="confirmElim()">Eliminate</button>
-      </div>
-    </div></div>`;
-}
-function closeModal(e){if(e.target.classList.contains('modal-overlay')) closeModalEl()}
-function closeModalEl(){const mc=document.getElementById('mc');if(mc)mc.innerHTML='';modalPlayerId=null;}
-function confirmElim(){
-  if(!modalPlayerId) return;
-  const p=getP(modalPlayerId);
-  if(p){p.alive=false;checkPromotion();}
-  modalPlayerId=null;
-  if(!checkWin()) render();
-}
-function skipVote(){startNight()}
+    function esc(value) {
+      return String(value == null ? "" : value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
 
-// ============================================================
-// RENDER DISPATCH
-// ============================================================
-function render(){
-  const app=document.getElementById('app');
-  if(G.screen==='setup') app.innerHTML=renderSetup();
-  else if(G.screen==='reveal') app.innerHTML=renderReveal();
-  else if(G.screen==='game'){
-    if(G.phase==='day') app.innerHTML=renderDay();
-    else if(G.phase==='night') app.innerHTML=renderNight();
-    else app.innerHTML=renderResolution();
-  } else if(G.screen==='gameover') app.innerHTML=renderGameover();
-  bindEv();
-}
+    function icon(name) {
+      return ICON[name] || ICON.info;
+    }
 
-// ============================================================
-// RENDER: SETUP
-// ============================================================
-function renderSetup(){
-  const c=G.config; const v=valMsg();
-  const pList=G.players.length?`
-    <div class="player-list mt12">
-      ${G.players.map((p,i)=>`
-        <div class="p-row">
-          <div class="p-num">${i+1}</div>
-          <div class="p-name">${esc(p.name)}</div>
-          <button class="p-del" onclick="removePlayer('${p.id}')">✕</button>
-        </div>`).join('')}
-    </div>`:'';
-  return `<div class="screen">
-    <div class="logo-block">
-      <div class="logo-title">MAFIA</div>
-      <div class="logo-sub">♠ ♥ ♦ ♣</div>
-    </div>
-    <div class="container">
-      <div class="sec">
-        <div class="lbl">Players</div>
-        <div class="irow">
-          <input type="text" id="ni" placeholder="Enter player name…" maxlength="20" autocomplete="off" autocorrect="off" autocapitalize="words">
-          <button class="btn btn-primary btn-sm" onclick="addPlayer(document.getElementById('ni').value)">Add</button>
-        </div>
-        ${pList}
-      </div>
-      <div class="sec">
-        <div class="lbl">Roles</div>
-        <div class="cfg-list">
-          ${cfgCtr('killers','Killers','Mafia','m',1,10,c.killers)}
-          ${cfgCtr('torturers','Torturers','Mafia','m',0,5,c.torturers)}
-          ${cfgCtr('doctors','Doctors','Town','t',0,5,c.doctors)}
-          ${cfgCtr('detectives','Detectives','Town','t',0,5,c.detectives)}
-          ${cfgTog('whore','Whore','Neutral · Survive to win','n',c.whore)}
-          ${cfgTog('joker','Joker','Neutral · Survive to win','n',c.joker)}
-        </div>
-      </div>
-      <div class="val-bar ${v.t}">
-        <span style="font-size:1rem">${v.t==='ok'?'✓':v.t==='err'?'✕':'◦'}</span>
-        <span>${v.msg}</span>
-      </div>
-      <button class="btn btn-primary btn-block" onclick="startGame()" ${isValid()?'':'disabled'}>
-        Deal Cards &amp; Start
-      </button>
-    </div>
-  </div>`;
-}
+    function alive(players = state.players) {
+      return players.filter((p) => p.alive);
+    }
 
-function cfgCtr(key,name,team,tc,min,max,val){
-  return `<div class="cfg-row">
-    <div class="cfg-info">
-      <div class="cfg-name">${name}</div>
-      <div class="cfg-team ${tc}">${team}</div>
-    </div>
-    <div class="ctr-ctrl">
-      <button class="c-btn" onclick="setConfig('${key}',Math.max(${min},G.config['${key}']-1))" ${val<=min?'disabled':''}>−</button>
-      <span class="c-val">${val}</span>
-      <button class="c-btn" onclick="setConfig('${key}',Math.min(${max},G.config['${key}']+1))" ${val>=max?'disabled':''}>+</button>
-    </div>
-  </div>`;
-}
+    function byId(id, players = state.players) {
+      return players.find((p) => p.id === id) || null;
+    }
 
-function cfgTog(key,name,team,tc,val){
-  return `<div class="cfg-row tog-row" onclick="setConfig('${key}',!G.config['${key}'])">
-    <div class="cfg-info">
-      <div class="cfg-name">${name}</div>
-      <div class="cfg-team ${tc}">${team}</div>
-    </div>
-    <div class="tog-wrap ${val?'on':''}"><div class="tok"></div></div>
-  </div>`;
-}
+    function aliveRole(role, players = state.players) {
+      return players.filter((p) => p.alive && p.role === role);
+    }
 
-// ============================================================
-// RENDER: REVEAL
-// ============================================================
-function renderReveal(){
-  if(G.revealIdx>=G.players.length) return '';
-  const p=G.players[G.revealIdx]; const r=ROLES[p.role];
-  const total=G.players.length; const isLast=G.revealIdx===total-1;
-  const glowColor=r.team==='mafia'?'var(--red)':r.team==='neutral'?'#9B6FD8':'var(--town)';
-  const cardHTML=`
-    <div class="card-scene card-deal" onclick="${G.cardFlipped?'':'flipCard()'}">
-      <div class="card-body${G.cardFlipped?' flipped':''}">
-        <div class="card-face card-back">
-          <div class="cb-inner"></div>
-          <div class="cb-suits">♠ ♥<br>♦ ♣</div>
-          <div class="cb-hint">Tap to reveal</div>
-        </div>
-        <div class="card-face card-front ${r.cs}">
-          <div class="cf-corner tl">${r.val}<br>${r.suit}</div>
-          <div class="cf-corner br">${r.val}<br>${r.suit}</div>
-          <div class="cf-center">
-            <div class="cf-val">${r.val}</div>
-            <div class="cf-suit">${r.suit}</div>
-            <div class="cf-rlabel">${r.label}</div>
+    function activeKillerIds(players = state.players) {
+      return players
+        .filter((p) => p.alive && (p.role === "killer" || (p.role === "torturer" && p.promoted)))
+        .map((p) => p.id);
+    }
+
+    function totalAssignedRoles(config = state.config) {
+      return config.killers + config.torturers + config.doctors + config.detectives + (config.whore ? 1 : 0) + (config.joker ? 1 : 0);
+    }
+
+    function civilianCount() {
+      return Math.max(0, state.players.length - totalAssignedRoles());
+    }
+
+    function validation() {
+      const total = totalAssignedRoles();
+      const townSlots = civilianCount() + state.config.doctors + state.config.detectives;
+      const mafiaSlots = state.config.killers + state.config.torturers;
+      if (state.players.length === 0) return { level: "warn", text: "Add at least 3 players to deal." };
+      if (state.players.length < 3) return { level: "err", text: `Need at least 3 players. You have ${state.players.length}.` };
+      if (state.config.killers < 1) return { level: "err", text: "At least one Killer is required." };
+      if (total > state.players.length) return { level: "err", text: `${total} roles selected for ${state.players.length} players.` };
+      if (townSlots < 1) return { level: "err", text: "Add at least one Town player or leave room for a Civilian." };
+      if (mafiaSlots >= townSlots) return { level: "err", text: "Town must outnumber Mafia when cards are dealt." };
+      return { level: "ok", text: `Ready. ${civilianCount()} Civilian${civilianCount() === 1 ? "" : "s"} will fill the deck.` };
+    }
+
+    function isValidSetup() {
+      return validation().level === "ok";
+    }
+
+    function scheduleRender(resetScroll) {
+      if (resetScroll) resetScrollNext = true;
+      if (renderQueued) return;
+      renderQueued = true;
+      requestAnimationFrame(render);
+    }
+
+    function navigate(screen, phase) {
+      const nextKey = `${screen}:${phase || ""}`;
+      const changed = nextKey !== state.transitionKey;
+      state.screen = screen;
+      if (phase) state.phase = phase;
+      state.transitionKey = nextKey;
+      if (changed) {
+        app.classList.add("is-moving");
+        setTimeout(() => {
+          app.classList.remove("is-moving");
+          scheduleRender(true);
+        }, 120);
+      }
+      scheduleRender(changed);
+    }
+
+    function render() {
+      renderQueued = false;
+      document.body.classList.toggle("night", state.phase === "night" || state.phase === "dawn" || state.screen === "reveal");
+      app.innerHTML = renderScreen();
+      modalRoot.innerHTML = renderModal();
+      toastRoot.innerHTML = renderToast();
+      if (resetScrollNext) {
+        resetScrollNext = false;
+        requestAnimationFrame(() => { app.scrollTop = 0; });
+      }
+    }
+
+    function renderScreen() {
+      if (state.screen === "setup") return renderSetup();
+      if (state.screen === "reveal") return renderReveal();
+      if (state.screen === "gameover") return renderGameOver();
+      if (state.phase === "night") return renderNight();
+      if (state.phase === "dawn") return renderDawn();
+      return renderDay();
+    }
+
+    function renderSetup() {
+      const v = validation();
+      const players = state.players.length
+        ? `<div class="player-list">${state.players.map((p, i) => renderSetupPlayer(p, i)).join("")}</div>`
+        : `<div class="player-list">${[0,1,2].map(() => '<div class="skeleton"></div>').join("")}</div>`;
+      return `
+        <section class="screen">
+          <div class="logo-wrap">
+            <div class="logo">MAFIA</div>
+            <div class="suits">♠ &nbsp; ♥ &nbsp; ♦ &nbsp; ♣</div>
+            <div class="kicker">One phone. Closed eyes. Bad alibis.</div>
           </div>
-        </div>
-      </div>
-    </div>`;
-  return `<div class="screen">
-    <div class="reveal-screen">
-      ${G.cardFlipped?`<div class="rev-glow" style="background:${glowColor}"></div>`:''}
-      <div class="rev-count">${G.revealIdx+1} of ${total}</div>
-      <div class="rev-name">${esc(p.name)}</div>
-      <div class="rev-card-wrap">${cardHTML}</div>
-      ${G.cardFlipped
-        ? `<div class="rev-hint fade-up">Remember your role, then pass the phone face-down.</div>
-           <div class="rev-actions fade-up">
-             <button class="btn btn-primary btn-block" onclick="nextReveal()">
-               ${isLast?'Give to Narrator →':`Pass to ${esc(G.players[G.revealIdx+1].name)} →`}
-             </button>
-           </div>`
-        : `<div class="rev-hint">Only ${esc(p.name)} should be looking 👀</div>`}
-    </div>
-  </div>`;
-}
-
-// ============================================================
-// RENDER: DAY
-// ============================================================
-function renderDay(){
-  const aliveP=alive(); const deadP=G.players.filter(p=>!p.alive);
-  return `<div class="screen">
-    <div class="game-header">
-      <div class="gh-inner">
-        <div class="gh-top">
-          <div class="gh-title">Round ${G.round}</div>
-          <div class="phase-pill pill-day">☀️ Day Phase</div>
-        </div>
-        <div class="gh-sub">${aliveP.length} alive · Tap a player to eliminate</div>
-      </div>
-    </div>
-    <div class="container mt12">
-      <div class="lbl mb8">Alive</div>
-      ${aliveP.map(p=>gpCard(p,true)).join('')}
-      ${deadP.length?`<div class="divider"></div><div class="lbl mb8">Eliminated</div>${deadP.map(p=>gpCard(p,false)).join('')}`:''}
-    </div>
-    <div class="bottom-bar-outer">
-      <div class="bottom-bar">
-        <button class="btn btn-glass flex-1" onclick="skipVote()">Skip Vote</button>
-        <button class="btn btn-primary flex-1" onclick="startNight()">Begin Night 🌙</button>
-      </div>
-    </div>
-    <div id="mc"></div>
-  </div>`;
-}
-
-function gpCard(p, clickable){
-  const r=ROLES[p.role];
-  const badges=[];
-  if(!p.canTalk) badges.push(`<span class="badge b-mute">🤐 Muted</span>`);
-  if(!p.canVote) badges.push(`<span class="badge b-novote">✋ No Vote</span>`);
-  if(p.promoted) badges.push(`<span class="badge b-promo">★ Killer</span>`);
-  const click=clickable&&p.alive?`onclick="showElimModal('${p.id}')"`:''
-  return `<div class="gp${!p.alive?' dead':''} ${!clickable||!p.alive?'no-tap':''}" ${click}>
-    <div class="rpip ${r.pip}">
-      <div class="pip-v">${r.val}</div>
-      <div class="pip-s">${r.suit}</div>
-    </div>
-    <div class="gp-info">
-      <div class="gp-name">${esc(p.name)}</div>
-      <div class="gp-role">${r.label}${!p.alive?' · Eliminated':''}</div>
-      ${badges.length?`<div class="gp-badges">${badges.join('')}</div>`:''}
-    </div>
-  </div>`;
-}
-
-// ============================================================
-// RENDER: NIGHT
-// ============================================================
-function renderNight(){
-  const step=curStep(); if(!step) return '<div></div>';
-  const dots=G.nightSteps.map((s,i)=>
-    `<div class="sdot ${i<G.nightStepIdx?'done':i===G.nightStepIdx?'active':''}"></div>`).join('');
-  return `<div class="screen">
-    <div class="game-header" style="background:rgba(2,2,12,.72);">
-      <div class="gh-inner">
-        <div class="gh-top">
-          <div class="gh-title">Round ${G.round}</div>
-          <div class="phase-pill pill-night">🌙 Night Phase</div>
-        </div>
-        <div class="sdots mt8">${dots}</div>
-      </div>
-    </div>
-    <div class="container mt12">
-      ${renderStep(step)}
-    </div>
-    <div id="mc"></div>
-  </div>`;
-}
-
-function renderStep(step){
-  switch(step.id){
-    case 'joker':    return stepJoker();
-    case 'kill':     return stepKill();
-    case 'torturer': return stepTorturer();
-    case 'whore':    return stepWhore();
-    case 'doctor':   return stepDoctor();
-    case 'detective':return stepDetective();
-  }
-  return '';
-}
-
-function nPick(p, selectedId){
-  const r=ROLES[p.role]; const sel=p.id===selectedId;
-  return `<div class="gp${sel?' sel':''}" onclick="nightPick('${p.id}')">
-    <div class="rpip ${r.pip}"><div class="pip-v">${r.val}</div><div class="pip-s">${r.suit}</div></div>
-    <div class="gp-info">
-      <div class="gp-name">${esc(p.name)}</div>
-      <div class="gp-role">${r.label}</div>
-    </div>
-    ${sel?`<div class="gp-ck">✓</div>`:''}
-  </div>`;
-}
-
-function stepJoker(){
-  const a=G.nightActions; const others=alive().filter(p=>p.role!=='joker');
-  return `<div class="step-card">
-    <div class="step-icon">🃏</div>
-    <div class="step-title">The Joker</div>
-    <div class="step-desc">Does the Joker wake up to suggest a target to the Killers?</div>
-  </div>
-  <div class="lbl">Action</div>
-  <div class="ac-grid mb12">
-    <div class="ac-btn${a.jokerAwoke?' sel':''}" onclick="toggleJoker()">
-      <div class="ac-icon">👁</div><div class="ac-label">Woke Up</div><div class="ac-desc">Points to someone</div>
-    </div>
-    <div class="ac-btn${!a.jokerAwoke?' sel':''}" onclick="toggleJoker()">
-      <div class="ac-icon">😴</div><div class="ac-label">Sleeping</div><div class="ac-desc">Stays in bed</div>
-    </div>
-  </div>
-  ${a.jokerAwoke?`<div class="lbl">Joker's suggestion</div>${others.map(p=>nPick(p,a.jokerSugg)).join('')}`:''}
-  <div class="bottom-bar-outer">
-    <div class="bottom-bar">
-      <button class="btn btn-glass flex-1" onclick="skipStep()">Skip</button>
-      <button class="btn btn-primary flex-1" onclick="nextStep()">Next →</button>
-    </div>
-  </div>`;
-}
-
-function stepKill(){
-  const a=G.nightActions;
-  const killers=G.players.filter(p=>p.alive&&(p.role==='killer'||(p.role==='torturer'&&p.promoted)));
-  const targets=alive().filter(p=>!killers.find(k=>k.id===p.id));
-  const sugg=a.jokerSugg?getP(a.jokerSugg):null;
-  return `<div class="step-card">
-    <div class="step-icon">🔪</div>
-    <div class="step-title">Killers Wake Up</div>
-    <div class="step-desc">${killers.map(k=>esc(k.name)).join(', ')} open${killers.length===1?'s':''} their eyes.${sugg?`<br><br><span class="tgold" style="font-size:.82rem">Joker suggested: ${esc(sugg.name)}</span>`:''}</div>
-  </div>
-  <div class="lbl">Choose kill target</div>
-  ${targets.map(p=>nPick(p,a.killTarget)).join('')}
-  <div class="bottom-bar-outer">
-    <div class="bottom-bar">
-      <button class="btn btn-glass flex-1" onclick="skipStep()">No Kill</button>
-      <button class="btn btn-primary flex-1" onclick="nextStep()">Confirm →</button>
-    </div>
-  </div>`;
-}
-
-function stepTorturer(){
-  const a=G.nightActions; const ta=G.torturerAction;
-  const tort=aliveRole('torturer').filter(p=>!p.promoted)[0];
-  const targets=alive();
-  return `<div class="step-card">
-    <div class="step-icon">🔧</div>
-    <div class="step-title">Torturer Wakes Up</div>
-    <div class="step-desc">${tort?esc(tort.name):'Torturer'} chooses how to mutilate. Can target anyone including self or Killers.</div>
-  </div>
-  <div class="lbl">Choose mutilation</div>
-  <div class="ac-grid mb12">
-    <div class="ac-btn${ta==='mouth'?' sel':''}" onclick="pickTortAction('mouth')">
-      <div class="ac-icon">🤐</div><div class="ac-label">Mouth</div><div class="ac-desc">Can't speak today</div>
-    </div>
-    <div class="ac-btn${ta==='hands'?' sel':''}" onclick="pickTortAction('hands')">
-      <div class="ac-icon">✋</div><div class="ac-label">Hands</div><div class="ac-desc">Can't vote today</div>
-    </div>
-  </div>
-  ${ta?`<div class="lbl">Select target</div>${targets.map(p=>nPick(p,a.tortTarget)).join('')}`:''}
-  <div class="bottom-bar-outer">
-    <div class="bottom-bar">
-      <button class="btn btn-glass flex-1" onclick="skipStep()">Skip</button>
-      <button class="btn btn-primary flex-1" onclick="nextStep()">Confirm →</button>
-    </div>
-  </div>`;
-}
-
-function stepWhore(){
-  const a=G.nightActions; const whore=aliveRole('whore')[0];
-  const others=alive().filter(p=>p.role!=='whore');
-  return `<div class="step-card">
-    <div class="step-icon">♥</div>
-    <div class="step-title">The Whore</div>
-    <div class="step-desc">${whore?esc(whore.name):'Whore'} chooses who to sleep with. If she picks the Killer — no kill. If her partner gets killed — both die.</div>
-  </div>
-  <div class="lbl">Choose bed partner</div>
-  ${others.map(p=>nPick(p,a.whoreTarget)).join('')}
-  <div class="bottom-bar-outer">
-    <div class="bottom-bar">
-      <button class="btn btn-glass flex-1" onclick="skipStep()">Nobody</button>
-      <button class="btn btn-primary flex-1" onclick="nextStep()">Confirm →</button>
-    </div>
-  </div>`;
-}
-
-function stepDoctor(){
-  const a=G.nightActions; const doc=aliveRole('doctor')[0];
-  const canSelf=G.round>1;
-  const targets=alive().filter(p=>canSelf||p.role!=='doctor');
-  return `<div class="step-card">
-    <div class="step-icon">💊</div>
-    <div class="step-title">Doctor Wakes Up</div>
-    <div class="step-desc">${doc?esc(doc.name):'Doctor'} chooses who to protect tonight.${!canSelf?`<br><span style="font-size:.74rem;color:var(--t3)">Cannot save self in round 1.</span>`:''}</div>
-  </div>
-  <div class="lbl">Select player to save</div>
-  ${targets.map(p=>nPick(p,a.doctorSave)).join('')}
-  <div class="bottom-bar-outer">
-    <div class="bottom-bar">
-      <button class="btn btn-glass flex-1" onclick="skipStep()">Skip</button>
-      <button class="btn btn-primary flex-1" onclick="nextStep()">Confirm →</button>
-    </div>
-  </div>`;
-}
-
-function stepDetective(){
-  const a=G.nightActions; const det=aliveRole('detective')[0];
-  const targets=alive().filter(p=>p.role!=='detective');
-  let result='';
-  if(a.detectCheck){
-    const tgt=getP(a.detectCheck);
-    if(tgt){
-      const isMafia=['killer','torturer'].includes(tgt.role);
-      result=`<div class="step-result ${isMafia?'sres-bad':'sres-ok'}">
-        ${isMafia?'👎 MAFIA — show thumbs down':'👍 Not mafia — show thumbs up'} to ${esc(det?.name||'Detective')}
-      </div>`;
-    }
-  }
-  return `<div class="step-card">
-    <div class="step-icon">🔍</div>
-    <div class="step-title">Detective Wakes Up</div>
-    <div class="step-desc">${det?esc(det.name):'Detective'} points to a suspect. Show thumbs to them.${result}</div>
-  </div>
-  <div class="lbl">Select suspect</div>
-  ${targets.map(p=>nPick(p,a.detectCheck)).join('')}
-  <div class="bottom-bar-outer">
-    <div class="bottom-bar">
-      <button class="btn btn-glass flex-1" onclick="skipStep()">Skip</button>
-      <button class="btn btn-primary flex-1" onclick="nextStep()">Finish Night →</button>
-    </div>
-  </div>`;
-}
-
-// ============================================================
-// RENDER: RESOLUTION
-// ============================================================
-function renderResolution(){
-  return `<div class="screen">
-    <div class="game-header" style="background:rgba(2,2,12,.72);">
-      <div class="gh-inner">
-        <div class="gh-top">
-          <div class="gh-title">Round ${G.round} — Dawn</div>
-          <div class="phase-pill pill-dawn">🌅 Night Ends</div>
-        </div>
-        <div class="gh-sub">Narrator announces results to everyone</div>
-      </div>
-    </div>
-    <div class="container mt12">
-      <div class="lbl mb8">What happened tonight</div>
-      ${G.resolution.map((e,i)=>`
-        <div class="res-ev ${e.cls}" style="animation-delay:${i*0.08}s">
-          <div class="rev-icon">${e.icon}</div>
-          <div class="flex-1">
-            <div class="rev-title">${e.title}</div>
-            <div class="rev-msg">${e.msg}</div>
+          <div class="panel glass">
+            <div class="section-label">${icon("users")} Players</div>
+            <div class="input-row">
+              <input class="name-input" id="player-name-field" value="${esc(state.currentName)}" maxlength="22" autocomplete="off" autocorrect="off" autocapitalize="words" placeholder="Player name">
+              <button class="btn btn-gold" data-action="add-player">${icon("plus")} Add</button>
+            </div>
+            <div style="height:12px"></div>
+            ${players}
           </div>
-        </div>`).join('')}
-    </div>
-    <div class="bottom-bar-outer">
-      <div class="bottom-bar">
-        <button class="btn btn-primary btn-block" onclick="endResolution()">☀️ Begin Day ${G.round+1}</button>
-      </div>
-    </div>
-  </div>`;
-}
+          <div class="panel glass">
+            <div class="section-label">${icon("cards")} Roles</div>
+            <div class="config-list">
+              ${renderStepper("killers", "Killers", "Mafia", 1, 10)}
+              ${renderStepper("torturers", "Torturers", "Mafia", 0, 8)}
+              ${renderStepper("doctors", "Doctors", "Town", 0, 6)}
+              ${renderStepper("detectives", "Detectives", "Town", 0, 6)}
+              ${renderToggle("whore", "Whore", "Neutral")}
+              ${renderToggle("joker", "Joker", "Neutral")}
+            </div>
+          </div>
+          <div class="validation ${v.level}">${icon(v.level === "ok" ? "check" : "info")} <span>${esc(v.text)}</span></div>
+          <button class="btn btn-primary btn-block" data-action="start-game" ${isValidSetup() ? "" : "disabled"}>${icon("cards")} Deal Cards &rarr;</button>
+        </section>`;
+    }
 
-// ============================================================
-// RENDER: GAME OVER
-// ============================================================
-function renderGameover(){
-  const win=G.gameResult==='town';
-  const sections=[
-    {label:'Mafia',roles:['killer','torturer']},
-    {label:'Town',roles:['civilian','detective','doctor']},
-    {label:'Neutral',roles:['whore','joker']},
-  ].filter(s=>G.players.some(p=>s.roles.includes(p.role)));
-  return `<div class="screen">
-    <div class="go-screen">
-      <div class="go-badge">${win?'⚖️':'🔪'}</div>
-      <div class="go-winner ${win?'tw':'mf'}">${win?'Town Wins':'Mafia Wins'}</div>
-      <div class="go-sub">${win?'The Mafia has been eliminated.':'The Mafia has taken control.'}</div>
-      ${sections.map(s=>`
-        <div class="go-sec">
-          <div class="lbl mb8">${s.label}</div>
-          ${G.players.filter(p=>s.roles.includes(p.role)).map((p,i)=>`
-            <div style="animation:fadeUp .4s var(--out) ${.12+i*.07}s both">
-              ${gpCard(p,false)}
-            </div>`).join('')}
-        </div>`).join('')}
-      <button class="btn btn-primary btn-block mt8" onclick="resetGame()">New Game</button>
-    </div>
-  </div>`;
-}
+    function renderSetupPlayer(player, index) {
+      return `
+        <div class="person-row glass-lite" style="--i:${index}">
+          <div class="row-num">${index + 1}</div>
+          <div class="player-name">${esc(player.name)}</div>
+          <button class="btn btn-ghost btn-icon" aria-label="Remove ${esc(player.name)}" data-action="remove-player" data-id="${player.id}">${icon("x")}</button>
+        </div>`;
+    }
 
-// ============================================================
-// BIND EVENTS
-// ============================================================
-function bindEv(){
-  const ni=document.getElementById('ni');
-  if(ni){
-    ni.value=nameInput;
-    ni.addEventListener('input',e=>nameInput=e.target.value);
-    ni.addEventListener('keydown',e=>{if(e.key==='Enter')addPlayer(ni.value)});
-  }
-}
+    function renderStepper(key, label, team, min, max) {
+      const value = state.config[key];
+      return `
+        <div class="config-row">
+          <div>
+            <div class="config-name">${label}</div>
+            <div class="config-meta">${team} - ${min} to ${max}</div>
+          </div>
+          <div class="stepper">
+            <button data-action="config-step" data-key="${key}" data-delta="-1" ${value <= min ? "disabled" : ""} aria-label="Decrease ${label}">${icon("minus")}</button>
+            <div class="stepper-value">${value}</div>
+            <button data-action="config-step" data-key="${key}" data-delta="1" ${value >= max ? "disabled" : ""} aria-label="Increase ${label}">${icon("plus")}</button>
+          </div>
+        </div>`;
+    }
 
-// ============================================================
-// INIT
-// ============================================================
-render();
-</script>
+    function renderToggle(key, label, team) {
+      const on = state.config[key];
+      return `
+        <button class="config-row" data-action="config-toggle" data-key="${key}" aria-pressed="${on}">
+          <div style="text-align:left">
+            <div class="config-name">${label}</div>
+            <div class="config-meta">${team} - optional role</div>
+          </div>
+          <span class="toggle ${on ? "on" : ""}"><span></span></span>
+        </button>`;
+    }
+
+    function renderReveal() {
+      const player = state.players[state.revealIndex];
+      if (!player) return "";
+      const role = ROLE[player.role];
+      const last = state.revealIndex === state.players.length - 1;
+      const nextName = last ? "Narrator" : state.players[state.revealIndex + 1].name;
+      return `
+        <section class="screen reveal-screen">
+          <div>
+            <div class="reveal-count">${state.revealIndex + 1} of ${state.players.length}</div>
+            <div class="reveal-name">${esc(player.name)}</div>
+          </div>
+          <button class="card-scene" data-action="flip-card" aria-label="Reveal card for ${esc(player.name)}">
+            <div class="playing-card ${state.cardFlipped ? "flipped" : ""}">
+              <div class="card-face card-back">
+                <div class="card-back-mark">MAFIA</div>
+              </div>
+              ${renderPlayingCard(role)}
+            </div>
+          </button>
+          <div>
+            <div class="reveal-hint">${state.cardFlipped ? `Memorize the role, then pass the phone face-down.` : `Only ${esc(player.name)} should look at this screen.`}</div>
+            ${state.cardFlipped ? `<div style="height:12px"></div><button class="btn btn-primary btn-block" data-action="next-reveal">${last ? "Hand to Narrator" : `Pass to ${esc(nextName)}`} &rarr;</button>` : ""}
+          </div>
+        </section>`;
+    }
+
+    function renderPlayingCard(role) {
+      const teamClass = role.team === "mafia" ? "mafia" : role.team === "neutral" ? "neutral" : "";
+      const pipClass = role.color === "red" ? "red-pip" : role.color === "gold" ? "gold-pip" : "black-pip";
+      return `
+        <div class="card-face card-front ${teamClass}">
+          <div class="card-corner ${pipClass}">${role.value}<br>${role.suit}</div>
+          <div class="card-corner br ${pipClass}">${role.value}<br>${role.suit}</div>
+          <div class="card-center">
+            <div>
+              <div class="card-value">${role.value}</div>
+              <div class="card-suit ${pipClass}">${role.suit}</div>
+              <div class="card-role">${role.label}</div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function renderHeader(phaseLabel, iconName, sub) {
+      return `
+        <header class="header glass">
+          <div class="header-top">
+            <div>
+              <div class="title">Round ${state.round}</div>
+              <div class="subtitle">${sub}</div>
+            </div>
+            <div class="phase-pill">${icon(iconName)} ${phaseLabel}</div>
+          </div>
+          ${state.phase === "night" ? `<div class="progress-dots">${state.night.steps.map((_, i) => `<span class="dot ${i < state.night.index ? "done" : i === state.night.index ? "active" : ""}"></span>`).join("")}</div>` : ""}
+        </header>`;
+    }
+
+    function renderDay() {
+      const live = alive();
+      const dead = state.players.filter((p) => !p.alive);
+      return `
+        <section class="screen">
+          ${renderHeader("Day", "sun", `${live.length} alive - tap a player to eliminate`)}
+          <div class="panel glass">
+            <div class="section-label">${icon("users")} Alive</div>
+            ${live.map((p, i) => renderPlayerRow(p, { index: i, action: "open-eliminate" })).join("")}
+            ${dead.length ? `<div class="boneyard"><div class="section-label">${icon("skull")} Boneyard</div>${dead.map((p, i) => renderPlayerRow(p, { index: i, dead: true })).join("")}</div>` : ""}
+          </div>
+          ${renderFab()}
+          <div class="bottom-actions">
+            <div class="bottom-inner">
+              <button class="btn btn-ghost" data-action="skip-vote">Skip Vote</button>
+              <button class="btn btn-primary" data-action="start-night">${icon("moon")} Begin Night</button>
+            </div>
+          </div>
+        </section>`;
+    }
+
+    function renderPlayerRow(player, opts = {}) {
+      const role = ROLE[player.role || "civilian"];
+      const badges = [];
+      if (!player.canTalk) badges.push(`<span class="badge gold">${icon("mouth")} Muted</span>`);
+      if (!player.canVote) badges.push(`<span class="badge gold">${icon("hand")} No vote</span>`);
+      if (player.promoted) badges.push(`<span class="badge red">${icon("crown")} Killer</span>`);
+      if (!player.alive) badges.push(`<span class="badge">${icon("skull")} Dead</span>`);
+      const selected = opts.selected ? "selected" : "";
+      const dead = opts.dead || !player.alive ? "dead" : "";
+      const action = opts.action ? `data-action="${opts.action}" data-id="${player.id}"` : "";
+      return `
+        <button class="game-row glass-lite ${selected} ${dead}" style="--i:${opts.index || 0}" ${action}>
+          ${renderRolePip(role)}
+          <div style="text-align:left; min-width:0">
+            <div class="player-name">${esc(player.name)}</div>
+            <div class="row-sub"><span>${role.label}</span>${badges.join("")}</div>
+          </div>
+          ${opts.selected ? `<div class="row-check">${icon("check")}</div>` : ""}
+        </button>`;
+    }
+
+    function renderRolePip(role) {
+      const team = role.team === "mafia" ? "mafia" : "";
+      const color = role.color === "red" ? "red-pip" : role.color === "gold" ? "gold-pip" : "";
+      return `<div class="role-pip ${team} ${color}"><span>${role.value}</span><span class="pip-suit">${role.suit}</span></div>`;
+    }
+
+    function renderFab() {
+      if (state.screen === "setup" || state.screen === "reveal") return "";
+      return `<button class="fab glass" data-action="open-narrator" aria-label="Open narrator panel">${icon("panel")}</button>`;
+    }
+
+    function renderNight() {
+      const step = state.night.steps[state.night.index];
+      if (!step) return "";
+      return `
+        <section class="screen">
+          ${renderHeader("Night", "moon", `Step ${state.night.index + 1} of ${state.night.steps.length}`)}
+          ${renderNightStep(step)}
+          ${renderFab()}
+        </section>`;
+    }
+
+    function renderNightStep(stepId) {
+      const meta = STEP_META[stepId];
+      const suggestion = state.night.actions.jokerSuggestion ? byId(state.night.actions.jokerSuggestion) : null;
+      const suggestionHint = suggestion && stepId !== "joker" ? `<div class="hint">${icon("mask")} Joker suggested ${esc(suggestion.name)}.</div>` : "";
+      return `
+        <div class="step-card glass" style="--glow:${meta.glow}">
+          <div class="section-label">${icon(meta.icon)} Night action</div>
+          <div class="step-title">${meta.title}</div>
+          <div class="step-copy">${stepIntro(stepId)}</div>
+          <div class="script-box">${meta.script}</div>
+        </div>
+        ${suggestionHint}
+        ${stepBody(stepId)}
+        <div class="bottom-actions">
+          <div class="bottom-inner">
+            <button class="btn btn-ghost" data-action="skip-step">Skip</button>
+            <button class="btn btn-primary" data-action="next-step">${stepId === "detective" ? "Finish Night" : "Next"} &rarr;</button>
+          </div>
+        </div>`;
+    }
+
+    function stepIntro(stepId) {
+      const a = state.night.actions;
+      if (stepId === "kill") {
+        const killers = state.players.filter((p) => p.alive && activeKillerIds().includes(p.id));
+        return `${killers.map((p) => esc(p.name)).join(", ")} choose one shared target.`;
+      }
+      if (stepId === "torturer") return "Mouth blocks speech. Hands blocks voting. Self-targets and Mafia targets are valid.";
+      if (stepId === "doctor") {
+        const actor = getDoctorActor();
+        return state.round === 1 ? `${esc(actor ? actor.name : "Doctor")} cannot self-save in round 1.` : "Choose one player to protect.";
+      }
+      if (stepId === "detective" && a.detectiveCheck) {
+        const target = byId(a.detectiveCheck);
+        if (target) return `${esc(target.name)} is ready for a private narrator result.`;
+      }
+      return STEP_META[stepId].script;
+    }
+
+    function stepBody(stepId) {
+      if (stepId === "joker") return stepJoker();
+      if (stepId === "kill") return stepKill();
+      if (stepId === "torturer") return stepTorturer();
+      if (stepId === "whore") return stepWhore();
+      if (stepId === "doctor") return stepDoctor();
+      if (stepId === "detective") return stepDetective();
+      return "";
+    }
+
+    function nightTargetList(players, selectedId) {
+      return `<div class="player-list">${players.map((p, i) => renderPlayerRow(p, { index: i, action: "night-pick", selected: p.id === selectedId })).join("")}</div>`;
+    }
+
+    function stepJoker() {
+      const a = state.night.actions;
+      const targets = alive().filter((p) => p.role !== "joker");
+      return `
+        <div class="action-grid">
+          <button class="action-tile ${a.jokerAwake ? "selected" : ""}" data-action="toggle-joker" data-mode="awake">${icon("eye")}<div class="action-title">Woke up</div><div class="action-sub">Point to a target</div></button>
+          <button class="action-tile ${!a.jokerAwake ? "selected" : ""}" data-action="toggle-joker" data-mode="sleep">${icon("sleep")}<div class="action-title">Sleeping</div><div class="action-sub">No suggestion</div></button>
+        </div>
+        ${a.jokerAwake ? `<div class="section-label">${icon("mask")} Suggested target</div>${nightTargetList(targets, a.jokerSuggestion)}` : ""}`;
+    }
+
+    function stepKill() {
+      const killerSet = new Set(activeKillerIds());
+      const targets = alive().filter((p) => !killerSet.has(p.id));
+      return `<div class="section-label">${icon("blade")} Shared kill target</div>${nightTargetList(targets, state.night.actions.killTarget)}`;
+    }
+
+    function stepTorturer() {
+      const a = state.night.actions;
+      return `
+        <div class="action-grid">
+          <button class="action-tile ${a.tortureMode === "mouth" ? "selected" : ""}" data-action="torture-mode" data-mode="mouth">${icon("mouth")}<div class="action-title">Mouth</div><div class="action-sub">Cannot speak today</div></button>
+          <button class="action-tile ${a.tortureMode === "hands" ? "selected" : ""}" data-action="torture-mode" data-mode="hands">${icon("hand")}<div class="action-title">Hands</div><div class="action-sub">Cannot vote today</div></button>
+        </div>
+        ${a.tortureMode ? `<div class="section-label">${icon("bind")} Target</div>${nightTargetList(torturerTargets(), a.tortureTarget)}` : ""}`;
+    }
+
+    function stepWhore() {
+      const targets = alive().filter((p) => p.role !== "whore");
+      return `<div class="section-label">${icon("heart")} Bed partner</div>${nightTargetList(targets, state.night.actions.whoreTarget)}`;
+    }
+
+    function stepDoctor() {
+      const doctors = aliveRole("doctor");
+      const actor = getDoctorActor();
+      const actorChooser = doctors.length > 1 && state.round === 1
+        ? `<div class="section-label">${icon("shield")} Acting Doctor</div><div class="player-list">${doctors.map((p, i) => renderPlayerRow(p, { index: i, action: "doctor-actor", selected: actor && p.id === actor.id })).join("")}</div>`
+        : "";
+      return `${actorChooser}<div class="section-label">${icon("shield")} Protected player</div>${nightTargetList(doctorTargets(actor ? actor.id : null), state.night.actions.doctorSave)}`;
+    }
+
+    function stepDetective() {
+      const a = state.night.actions;
+      const detectives = aliveRole("detective");
+      const targets = alive().filter((p) => p.role !== "detective");
+      const target = a.detectiveCheck ? byId(a.detectiveCheck) : null;
+      const result = target ? detectiveResult(target, detectives[0]) : "";
+      return `${result}<div class="section-label">${icon("search")} Suspect</div>${nightTargetList(targets, a.detectiveCheck)}`;
+    }
+
+    function detectiveResult(target, detective) {
+      const mafia = target.role === "killer" || target.role === "torturer";
+      return `
+        <div class="result-card ${mafia ? "bad" : "good"}">
+          ${icon(mafia ? "thumbDown" : "thumbUp")}
+          <div>${mafia ? "MAFIA" : "NOT MAFIA"} - show ${mafia ? "thumbs down" : "thumbs up"} privately${detective ? ` to ${esc(detective.name)}` : ""}.</div>
+        </div>`;
+    }
+
+    function renderDawn() {
+      return `
+        <section class="screen">
+          ${renderHeader("Dawn", "sun", "Narrator announces what happened")}
+          <div class="panel glass">
+            <div class="section-label">${icon("log")} Night report</div>
+            <div class="event-list">
+              ${state.events.map((event, i) => renderEvent(event, i)).join("")}
+            </div>
+          </div>
+          ${renderFab()}
+          <div class="bottom-actions">
+            <div class="bottom-inner single">
+              <button class="btn btn-primary" data-action="begin-day">${icon("sun")} Begin Day ${state.round + 1}</button>
+            </div>
+          </div>
+        </section>`;
+    }
+
+    function renderEvent(event, index) {
+      return `
+        <div class="event-row glass-lite ${event.kind}" style="--i:${index}">
+          <div class="event-icon">${icon(event.icon)}</div>
+          <div>
+            <div class="event-title">${esc(event.title)}</div>
+            <div class="event-msg">${esc(event.message)}</div>
+          </div>
+        </div>`;
+    }
+
+    function renderGameOver() {
+      const town = state.result === "town";
+      return `
+        <section class="screen">
+          <div class="winner-mark">${icon(town ? "shield" : "blade")}</div>
+          <div class="winner-title">${town ? "Town Wins" : "Mafia Wins"}</div>
+          <div class="winner-copy">${town ? "All Killers and Torturers are gone. The town survives the table." : "The Mafia now equals or outnumbers the Town. Control is gone."}</div>
+          ${TEAM_ORDER.filter((team) => state.players.some((p) => team.roles.includes(p.role))).map(renderTeamSection).join("")}
+          <button class="btn btn-primary btn-block" data-action="new-game">${icon("cards")} New Game</button>
+        </section>`;
+    }
+
+    function renderTeamSection(team) {
+      const members = state.players.filter((p) => team.roles.includes(p.role));
+      return `
+        <div class="team-section panel glass">
+          <div class="section-label">${team.label}</div>
+          ${members.map((p, i) => renderPlayerRow(p, { index: i, dead: !p.alive })).join("")}
+        </div>`;
+    }
+
+    function renderModal() {
+      if (!state.modal) return "";
+      if (state.modal.type === "eliminate") return renderEliminateModal();
+      if (state.modal.type === "narrator") return renderNarratorModal();
+      return "";
+    }
+
+    function renderEliminateModal() {
+      const player = byId(state.modal.id);
+      if (!player) return "";
+      return `
+        <div class="overlay" data-action="modal-backdrop">
+          <div class="sheet glass" data-sheet>
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">Eliminate ${esc(player.name)}?</div>
+            <p class="muted">Their role will be visible in the boneyard. You will have five seconds to undo.</p>
+            <div class="modal-actions">
+              <button class="btn btn-ghost" data-action="close-modal">Cancel</button>
+              <button class="btn btn-danger" data-action="confirm-eliminate" data-id="${player.id}">${icon("skull")} Eliminate</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function renderNarratorModal() {
+      const counts = liveCounts();
+      const body = state.narratorTab === "roles" ? renderNarratorRoles() : renderNightLog();
+      return `
+        <div class="overlay" data-action="modal-backdrop">
+          <div class="sheet glass" data-sheet>
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">Narrator Panel</div>
+            <div class="count-grid">
+              <div class="count-box"><div class="count-num">${counts.mafia}</div><div class="count-label">Mafia</div></div>
+              <div class="count-box"><div class="count-num">${counts.town}</div><div class="count-label">Town</div></div>
+              <div class="count-box"><div class="count-num">${counts.alive}</div><div class="count-label">Alive</div></div>
+            </div>
+            <div class="tabs">
+              <button class="tab ${state.narratorTab === "roles" ? "active" : ""}" data-action="narrator-tab" data-tab="roles">Roles</button>
+              <button class="tab ${state.narratorTab === "log" ? "active" : ""}" data-action="narrator-tab" data-tab="log">Night Log</button>
+            </div>
+            <div class="sheet-body">${body}</div>
+            <button class="btn btn-ghost btn-block" data-action="close-modal">${icon("x")} Close</button>
+          </div>
+        </div>`;
+    }
+
+    function renderNarratorRoles() {
+      return state.players.map((player, i) => {
+        const controls = player.alive ? `
+          <div class="row-sub">
+            <button class="badge ${player.canTalk ? "" : "gold"}" data-action="toggle-talk" data-id="${player.id}">${icon("mouth")} ${player.canTalk ? "Can talk" : "Muted"}</button>
+            <button class="badge ${player.canVote ? "" : "gold"}" data-action="toggle-vote" data-id="${player.id}">${icon("hand")} ${player.canVote ? "Can vote" : "No vote"}</button>
+          </div>` : "";
+        return `<div>${renderPlayerRow(player, { index: i, dead: !player.alive })}${controls}</div>`;
+      }).join("");
+    }
+
+    function renderNightLog() {
+      if (!state.history.length) return `<div class="event-row glass-lite info">${icon("info")}<div><div class="event-title">No night log yet</div><div class="event-msg">Night events will appear here after the first dawn.</div></div></div>`;
+      return state.history.slice().reverse().map((round) => `
+        <div class="panel glass-lite">
+          <div class="section-label">Round ${round.round}</div>
+          ${round.events.map((event, i) => renderEvent(event, i)).join("")}
+        </div>`).join("");
+    }
+
+    function renderToast() {
+      if (!state.undo) return "";
+      const player = byId(state.undo.playerId);
+      return `
+        <div class="undo glass">
+          <div>
+            <div class="undo-text">${esc(player ? player.name : "Player")} eliminated</div>
+            <div class="undo-sub">Undo available for five seconds.</div>
+          </div>
+          <button class="btn btn-gold" data-action="undo-eliminate">Undo</button>
+          <div class="undo-progress"></div>
+        </div>`;
+    }
+
+    function liveCounts(players = state.players) {
+      const live = alive(players);
+      return {
+        alive: live.length,
+        mafia: live.filter((p) => p.role === "killer" || p.role === "torturer").length,
+        town: live.filter((p) => ["civilian", "detective", "doctor"].includes(p.role)).length,
+        neutral: live.filter((p) => ["whore", "joker"].includes(p.role)).length
+      };
+    }
+
+    function addPlayer() {
+      const field = document.getElementById("player-name-field");
+      const name = (field ? field.value : state.currentName).trim();
+      if (!name) return;
+      state.players.push({ id: uid(), name, role: null, alive: true, canTalk: true, canVote: true, promoted: false });
+      state.currentName = "";
+      pulse("tap");
+      scheduleRender();
+      requestAnimationFrame(() => {
+        const next = document.getElementById("player-name-field");
+        if (next) next.focus();
+      });
+    }
+
+    function setConfigStep(key, delta) {
+      const limits = { killers: [1, 10], torturers: [0, 8], doctors: [0, 6], detectives: [0, 6] };
+      const [min, max] = limits[key] || [0, 10];
+      state.config[key] = Math.max(min, Math.min(max, state.config[key] + delta));
+      pulse("tap");
+      scheduleRender();
+    }
+
+    function startGame() {
+      if (!isValidSetup()) return;
+      clearUndo();
+      const deck = [];
+      for (let i = 0; i < state.config.killers; i++) deck.push("killer");
+      for (let i = 0; i < state.config.torturers; i++) deck.push("torturer");
+      for (let i = 0; i < state.config.doctors; i++) deck.push("doctor");
+      for (let i = 0; i < state.config.detectives; i++) deck.push("detective");
+      if (state.config.whore) deck.push("whore");
+      if (state.config.joker) deck.push("joker");
+      while (deck.length < state.players.length) deck.push("civilian");
+      shuffle(deck);
+      state.players.forEach((p, i) => {
+        p.role = deck[i];
+        p.alive = true;
+        p.canTalk = true;
+        p.canVote = true;
+        p.promoted = false;
+      });
+      state.revealIndex = 0;
+      state.cardFlipped = false;
+      state.round = 1;
+      state.torturerPromoted = false;
+      state.events = [];
+      state.history = [];
+      state.result = null;
+      wantsWakeLock = true;
+      acquireWakeLock();
+      pulse("tap");
+      navigate("reveal", "reveal");
+    }
+
+    function shuffle(items) {
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = randomInt(i + 1);
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+    }
+
+    function randomInt(max) {
+      if (window.crypto && crypto.getRandomValues) {
+        const values = new Uint32Array(1);
+        crypto.getRandomValues(values);
+        return values[0] % max;
+      }
+      return Math.floor(Math.random() * max);
+    }
+
+    function flipCard() {
+      if (state.cardFlipped) return;
+      state.cardFlipped = true;
+      pulse("flip");
+      scheduleRender();
+    }
+
+    function nextReveal() {
+      state.revealIndex += 1;
+      state.cardFlipped = false;
+      if (state.revealIndex >= state.players.length) {
+        navigate("game", "day");
+      } else {
+        pulse("tap");
+        scheduleRender(true);
+      }
+    }
+
+    function startNight() {
+      clearUndo();
+      state.players.forEach((p) => {
+        if (p.alive) {
+          p.canTalk = true;
+          p.canVote = true;
+        }
+      });
+      state.night.actions = emptyActions();
+      state.night.steps = buildNightSteps();
+      state.night.index = 0;
+      if (!state.night.steps.length) {
+        resolveNight();
+        return;
+      }
+      pulse("night");
+      vibrate([10, 50, 10]);
+      navigate("game", "night");
+    }
+
+    function buildNightSteps(players = state.players) {
+      const steps = [];
+      if (aliveRole("joker", players).length) steps.push("joker");
+      if (activeKillerIds(players).length) steps.push("kill");
+      if (aliveRole("torturer", players).some((p) => !p.promoted) && !state.torturerPromoted) steps.push("torturer");
+      if (aliveRole("whore", players).length) steps.push("whore");
+      if (aliveRole("doctor", players).length) steps.push("doctor");
+      if (aliveRole("detective", players).length) steps.push("detective");
+      return steps;
+    }
+
+    function currentStep() {
+      return state.night.steps[state.night.index] || null;
+    }
+
+    function pickNightTarget(id) {
+      const step = currentStep();
+      const a = state.night.actions;
+      if (step === "joker" && a.jokerAwake) a.jokerSuggestion = a.jokerSuggestion === id ? null : id;
+      if (step === "kill") a.killTarget = a.killTarget === id ? null : id;
+      if (step === "torturer" && a.tortureMode) a.tortureTarget = a.tortureTarget === id ? null : id;
+      if (step === "whore") a.whoreTarget = a.whoreTarget === id ? null : id;
+      if (step === "doctor") a.doctorSave = a.doctorSave === id ? null : id;
+      if (step === "detective") a.detectiveCheck = a.detectiveCheck === id ? null : id;
+      pulse("tap");
+      scheduleRender();
+    }
+
+    function nextStep() {
+      state.night.index += 1;
+      if (state.night.index >= state.night.steps.length) {
+        resolveNight();
+      } else {
+        pulse("tap");
+        scheduleRender(true);
+      }
+    }
+
+    function skipStep() {
+      const step = currentStep();
+      const a = state.night.actions;
+      if (step === "joker") { a.jokerAwake = false; a.jokerSuggestion = null; }
+      if (step === "kill") a.killTarget = null;
+      if (step === "torturer") { a.tortureMode = null; a.tortureTarget = null; }
+      if (step === "whore") a.whoreTarget = null;
+      if (step === "doctor") { a.doctorSave = null; a.doctorActor = null; }
+      if (step === "detective") a.detectiveCheck = null;
+      nextStep();
+    }
+
+    function resolveNight() {
+      const outcome = resolveNightCore(state.players, state.night.actions, {
+        round: state.round,
+        torturerPromoted: state.torturerPromoted
+      });
+      state.torturerPromoted = outcome.torturerPromoted;
+      state.events = outcome.events.length ? outcome.events : [{ kind: "info", icon: "moon", title: "Quiet night", message: "No public result was announced." }];
+      state.history.push({ round: state.round, events: state.events.map((e) => ({ ...e })) });
+      const winner = getWinner(state.players);
+      if (winner) {
+        finishGame(winner);
+        return;
+      }
+      navigate("game", "dawn");
+    }
+
+    function resolveNightCore(players, actions, context) {
+      const events = [];
+      const killerIds = activeKillerIds(players);
+      const whore = players.find((p) => p.alive && p.role === "whore") || null;
+      const savedId = actions.doctorSave || null;
+      const whoreTargetId = actions.whoreTarget || null;
+      const killTargetId = actions.killTarget || null;
+      const sleptWithActiveKiller = Boolean(whore && whoreTargetId && killerIds.includes(whoreTargetId));
+
+      if (killTargetId && sleptWithActiveKiller) {
+        events.push({ kind: "info", icon: "heart", title: "No kill tonight", message: "The Whore slept with an active Killer. The Mafia kill fails." });
+      } else if (killTargetId) {
+        const target = byId(killTargetId, players);
+        const whoreIsTarget = Boolean(whore && killTargetId === whore.id);
+        const partnerIsTarget = Boolean(whore && whoreTargetId && killTargetId === whoreTargetId && !whoreIsTarget);
+
+        if (whoreIsTarget) {
+          if (savedId === whore.id) {
+            events.push({ kind: "save", icon: "shield", title: `${whore.name} was saved`, message: "Doctor saved the Whore. Her partner also lives." });
+          } else {
+            killPlayer(whore.id, players);
+            events.push({ kind: "death", icon: "skull", title: `${whore.name} died`, message: "Eliminated by the Mafia" });
+            const partner = whoreTargetId ? byId(whoreTargetId, players) : null;
+            if (partner && partner.alive) {
+              if (savedId === partner.id) {
+                events.push({ kind: "save", icon: "shield", title: `${partner.name} was saved`, message: "Doctor saved the Whore's partner." });
+              } else {
+                killPlayer(partner.id, players);
+                events.push({ kind: "death", icon: "skull", title: `${partner.name} died`, message: "Shares the fate of the Whore" });
+              }
+            }
+          }
+        } else if (partnerIsTarget) {
+          const partner = target;
+          if (partner && savedId === partner.id) {
+            events.push({ kind: "save", icon: "shield", title: `${partner.name} was saved`, message: "Doctor saved the Whore's partner. The Whore also lives." });
+          } else {
+            if (partner) {
+              killPlayer(partner.id, players);
+              events.push({ kind: "death", icon: "skull", title: `${partner.name} died`, message: "Eliminated by the Mafia" });
+            }
+            if (whore && whore.alive) {
+              if (savedId === whore.id) {
+                events.push({ kind: "save", icon: "shield", title: `${whore.name} was saved`, message: "Doctor saved the Whore from sharing her partner's fate." });
+              } else {
+                killPlayer(whore.id, players);
+                events.push({ kind: "death", icon: "skull", title: `${whore.name} died`, message: "The Whore shares the fate of her partner" });
+              }
+            }
+          }
+        } else if (target) {
+          if (savedId === target.id) {
+            events.push({ kind: "save", icon: "shield", title: `${target.name} was saved`, message: "Doctor protected the Mafia target." });
+          } else {
+            killPlayer(target.id, players);
+            events.push({ kind: "death", icon: "skull", title: `${target.name} died`, message: "Eliminated by the Mafia" });
+          }
+        }
+      } else {
+        events.push({ kind: "info", icon: "moon", title: "No kill", message: "The Mafia did not choose a victim." });
+      }
+
+      if (actions.tortureTarget && actions.tortureMode && !context.torturerPromoted) {
+        const target = byId(actions.tortureTarget, players);
+        if (target && target.alive) {
+          if (actions.tortureMode === "mouth") {
+            target.canTalk = false;
+            events.push({ kind: "torture", icon: "mouth", title: `${target.name} is silenced`, message: `${target.name} cannot speak during the next day.` });
+          } else {
+            target.canVote = false;
+            events.push({ kind: "torture", icon: "hand", title: `${target.name} is restrained`, message: `${target.name} cannot vote during the next day.` });
+          }
+        }
+      }
+
+      if (actions.detectiveCheck) {
+        const target = byId(actions.detectiveCheck, players);
+        if (target) {
+          const mafia = target.role === "killer" || target.role === "torturer";
+          events.push({ kind: mafia ? "death" : "info", icon: mafia ? "thumbDown" : "thumbUp", title: `${target.name}: ${mafia ? "MAFIA" : "NOT MAFIA"}`, message: mafia ? "Show thumbs down to the Detective." : "Show thumbs up to the Detective." });
+        }
+      }
+
+      const promotion = applyPromotion(players, context.torturerPromoted);
+      if (promotion.promoted.length) {
+        events.push({ kind: "info", icon: "crown", title: "Succession", message: `${promotion.promoted.map((p) => p.name).join(", ")} becomes the active Killer.` });
+      }
+
+      return { events, torturerPromoted: promotion.torturerPromoted };
+    }
+
+    function killPlayer(id, players = state.players) {
+      const player = byId(id, players);
+      if (player) player.alive = false;
+    }
+
+    function applyPromotion(players = state.players, alreadyPromoted = state.torturerPromoted) {
+      if (alreadyPromoted) return { promoted: [], torturerPromoted: true };
+      const livingKillers = players.filter((p) => p.alive && p.role === "killer");
+      const torturers = players.filter((p) => p.alive && p.role === "torturer" && !p.promoted);
+      if (livingKillers.length === 0 && torturers.length > 0) {
+        torturers.forEach((p) => { p.promoted = true; });
+        return { promoted: torturers, torturerPromoted: true };
+      }
+      return { promoted: [], torturerPromoted: alreadyPromoted };
+    }
+
+    function getWinner(players = state.players) {
+      const counts = liveCounts(players);
+      if (counts.mafia === 0) return "town";
+      if (counts.mafia >= counts.town) return "mafia";
+      return null;
+    }
+
+    function finishGame(result, options = {}) {
+      state.result = result;
+      if (!options.preserveUndo) clearUndo();
+      wantsWakeLock = false;
+      releaseWakeLock();
+      pulse(result === "town" ? "townWin" : "mafiaWin");
+      navigate("gameover", "over");
+    }
+
+    function beginDay() {
+      state.round += 1;
+      navigate("game", "day");
+    }
+
+    function openEliminate(id) {
+      const player = byId(id);
+      if (!player || !player.alive) return;
+      state.modal = { type: "eliminate", id };
+      pulse("tap");
+      scheduleRender();
+    }
+
+    function confirmEliminate(id) {
+      const player = byId(id);
+      if (!player || !player.alive) return;
+      const beforePromoted = state.torturerPromoted;
+      player.alive = false;
+      const promotion = applyPromotion(state.players, state.torturerPromoted);
+      state.torturerPromoted = promotion.torturerPromoted;
+      state.undo = {
+        playerId: player.id,
+        role: player.role,
+        promotedIds: promotion.promoted.map((p) => p.id),
+        torturerPromotedBefore: beforePromoted
+      };
+      state.modal = null;
+      startUndoTimer();
+      vibrate(15);
+      pulse("kill");
+      const winner = getWinner();
+      if (winner) {
+        finishGame(winner, { preserveUndo: true });
+        return;
+      }
+      scheduleRender();
+    }
+
+    function undoEliminate() {
+      if (!state.undo) return;
+      const undo = state.undo;
+      const player = byId(undo.playerId);
+      if (player) player.alive = true;
+      if (undo.role === "killer" && undo.promotedIds.length) {
+        undo.promotedIds.forEach((id) => {
+          const promoted = byId(id);
+          if (promoted) promoted.promoted = false;
+        });
+        state.torturerPromoted = undo.torturerPromotedBefore;
+      }
+      clearUndo();
+      state.result = null;
+      wantsWakeLock = true;
+      acquireWakeLock();
+      pulse("tap");
+      navigate("game", "day");
+    }
+
+    function startUndoTimer() {
+      window.clearTimeout(undoTimer);
+      undoTimer = window.setTimeout(() => {
+        state.undo = null;
+        scheduleRender();
+      }, 5000);
+    }
+
+    function clearUndo() {
+      window.clearTimeout(undoTimer);
+      undoTimer = 0;
+      state.undo = null;
+    }
+
+    function getDoctorActor() {
+      const doctors = aliveRole("doctor");
+      if (!doctors.length) return null;
+      const selected = state.night.actions.doctorActor ? byId(state.night.actions.doctorActor) : null;
+      if (selected && selected.alive && selected.role === "doctor") return selected;
+      state.night.actions.doctorActor = doctors[0].id;
+      return doctors[0];
+    }
+
+    function doctorTargets(actorId, players = state.players, round = state.round) {
+      return alive(players).filter((p) => !(round === 1 && actorId && p.id === actorId));
+    }
+
+    function torturerTargets(players = state.players) {
+      return alive(players);
+    }
+
+    function resetGame() {
+      clearUndo();
+      const preservedPlayers = state.players.map((p) => ({
+        id: uid(),
+        name: p.name,
+        role: null,
+        alive: true,
+        canTalk: true,
+        canVote: true,
+        promoted: false
+      }));
+      state.players = preservedPlayers;
+      state.revealIndex = 0;
+      state.cardFlipped = false;
+      state.round = 1;
+      state.phase = "setup";
+      state.torturerPromoted = false;
+      state.night = { steps: [], index: 0, actions: emptyActions() };
+      state.events = [];
+      state.history = [];
+      state.result = null;
+      state.modal = null;
+      wantsWakeLock = false;
+      releaseWakeLock();
+      navigate("setup", "setup");
+    }
+
+    function clonePlayers(list) {
+      return list.map((p) => ({ ...p }));
+    }
+
+    async function ensureAudio() {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      if (!audioCtx) audioCtx = new Ctx();
+      if (audioCtx.state === "suspended") await audioCtx.resume();
+      return audioCtx;
+    }
+
+    async function tone(freqA, freqB, duration, type, gainValue) {
+      const ctx = await ensureAudio();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type || "sine";
+      osc.frequency.setValueAtTime(freqA, ctx.currentTime);
+      if (freqB) osc.frequency.exponentialRampToValueAtTime(freqB, ctx.currentTime + duration);
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(gainValue || 0.08, ctx.currentTime + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration + 0.02);
+    }
+
+    function chord(notes, duration, type, gain) {
+      notes.forEach((note, i) => window.setTimeout(() => { tone(note[0], note[1], duration, type, gain); }, i * 80));
+    }
+
+    function pulse(kind) {
+      vibrate(8);
+      if (kind === "flip") { tone(700, 180, .09, "sine", .09); return; }
+      if (kind === "night") { chord([[392, 330], [330, 262], [262, 196]], .62, "sine", .055); return; }
+      if (kind === "kill") { chord([[110, 82], [147, 110], [185, 130]], .55, "sawtooth", .045); return; }
+      if (kind === "townWin") { chord([[262, 330], [330, 392], [392, 523], [523, 659]], .34, "sine", .06); return; }
+      if (kind === "mafiaWin") { chord([[220, 165], [185, 130], [147, 98]], .55, "sawtooth", .05); return; }
+      tone(440, 660, .05, "sine", .045);
+    }
+
+    function vibrate(pattern) {
+      if ("vibrate" in navigator) navigator.vibrate(pattern);
+    }
+
+    async function acquireWakeLock() {
+      if (!("wakeLock" in navigator) || !wantsWakeLock || document.visibilityState !== "visible") return;
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener("release", () => {
+          wakeLock = null;
+          if (wantsWakeLock && document.visibilityState === "visible") window.setTimeout(acquireWakeLock, 250);
+        }, { once: true });
+      } catch (_) {
+        wakeLock = null;
+      }
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock) {
+        const lock = wakeLock;
+        wakeLock = null;
+        lock.release().catch(() => {});
+      }
+    }
+
+    function createStars() {
+      const root = document.getElementById("stars");
+      const stars = [];
+      for (let i = 0; i < 130; i++) {
+        const x = Math.round(Math.random() * 10000) / 100;
+        const y = Math.round(Math.random() * 10000) / 100;
+        const size = Math.round((Math.random() * 1.7 + .8) * 10) / 10;
+        const duration = Math.round((Math.random() * 2600 + 1600));
+        stars.push(`<span class="star" style="--x:${x}%;--y:${y}%;--s:${size}px;--d:${duration}ms"></span>`);
+      }
+      root.innerHTML = stars.join("");
+    }
+
+    function handleClick(event) {
+      const actionable = event.target.closest("[data-action]");
+      if (!actionable) return;
+      const action = actionable.dataset.action;
+      if (action === "modal-backdrop" && event.target !== actionable) return;
+      if (action === "add-player") addPlayer();
+      if (action === "remove-player") { state.players = state.players.filter((p) => p.id !== actionable.dataset.id); pulse("tap"); scheduleRender(); }
+      if (action === "config-step") setConfigStep(actionable.dataset.key, Number(actionable.dataset.delta));
+      if (action === "config-toggle") { state.config[actionable.dataset.key] = !state.config[actionable.dataset.key]; pulse("tap"); scheduleRender(); }
+      if (action === "start-game") startGame();
+      if (action === "flip-card") flipCard();
+      if (action === "next-reveal") nextReveal();
+      if (action === "open-eliminate") openEliminate(actionable.dataset.id);
+      if (action === "confirm-eliminate") confirmEliminate(actionable.dataset.id);
+      if (action === "undo-eliminate") undoEliminate();
+      if (action === "skip-vote" || action === "start-night") startNight();
+      if (action === "open-narrator") { state.modal = { type: "narrator" }; pulse("tap"); scheduleRender(); }
+      if (action === "close-modal" || action === "modal-backdrop") { state.modal = null; pulse("tap"); scheduleRender(); }
+      if (action === "narrator-tab") { state.narratorTab = actionable.dataset.tab; pulse("tap"); scheduleRender(); }
+      if (action === "toggle-talk") { const p = byId(actionable.dataset.id); if (p) p.canTalk = !p.canTalk; pulse("tap"); scheduleRender(); }
+      if (action === "toggle-vote") { const p = byId(actionable.dataset.id); if (p) p.canVote = !p.canVote; pulse("tap"); scheduleRender(); }
+      if (action === "night-pick") pickNightTarget(actionable.dataset.id);
+      if (action === "toggle-joker") { state.night.actions.jokerAwake = actionable.dataset.mode === "awake"; if (!state.night.actions.jokerAwake) state.night.actions.jokerSuggestion = null; pulse("tap"); scheduleRender(); }
+      if (action === "torture-mode") { state.night.actions.tortureMode = state.night.actions.tortureMode === actionable.dataset.mode ? null : actionable.dataset.mode; state.night.actions.tortureTarget = null; pulse("tap"); scheduleRender(); }
+      if (action === "doctor-actor") { state.night.actions.doctorActor = actionable.dataset.id; state.night.actions.doctorSave = null; pulse("tap"); scheduleRender(); }
+      if (action === "next-step") nextStep();
+      if (action === "skip-step") skipStep();
+      if (action === "begin-day") beginDay();
+      if (action === "new-game") resetGame();
+    }
+
+    function handleInput(event) {
+      if (event.target && event.target.id === "player-name-field") state.currentName = event.target.value;
+    }
+
+    function handleKey(event) {
+      if (event.key === "Enter" && event.target && event.target.id === "player-name-field") addPlayer();
+      if (event.key === "Escape" && state.modal) { state.modal = null; scheduleRender(); }
+    }
+
+    function handlePointerDown(event) {
+      const sheet = event.target.closest("[data-sheet]");
+      if (!sheet) return;
+      dragSheet = { sheet, startY: event.clientY, currentY: 0, pointerId: event.pointerId };
+      sheet.setPointerCapture(event.pointerId);
+    }
+
+    function handlePointerMove(event) {
+      if (!dragSheet || dragSheet.pointerId !== event.pointerId) return;
+      const delta = Math.max(0, event.clientY - dragSheet.startY);
+      dragSheet.currentY = delta;
+      if (!dragRaf) {
+        dragRaf = requestAnimationFrame(() => {
+          dragRaf = 0;
+          if (dragSheet) dragSheet.sheet.style.transform = `translate3d(0, ${dragSheet.currentY}px, 0)`;
+        });
+      }
+    }
+
+    function handlePointerUp(event) {
+      if (!dragSheet || dragSheet.pointerId !== event.pointerId) return;
+      const shouldClose = dragSheet.currentY > 90;
+      dragSheet.sheet.style.transform = "";
+      dragSheet = null;
+      if (shouldClose) {
+        state.modal = null;
+        scheduleRender();
+      }
+    }
+
+    function runLogicTests() {
+      const make = (role, name) => ({ id: uid(), name: name || role, role, alive: true, canTalk: true, canVote: true, promoted: false });
+      const assert = (ok, label) => { if (!ok) throw new Error(label); };
+
+      let players = [make("killer", "K"), make("whore", "W"), make("doctor", "D"), make("civilian", "C")];
+      let out = resolveNightCore(clonePlayers(players), { ...emptyActions(), killTarget: players[3].id, whoreTarget: players[0].id, doctorSave: players[3].id }, { round: 1, torturerPromoted: false });
+      assert(out.events.some((e) => e.title === "No kill tonight"), "Whore with active Killer blocks kill");
+
+      players = [make("killer", "K"), make("whore", "W"), make("doctor", "D"), make("civilian", "P")];
+      let sim = clonePlayers(players);
+      resolveNightCore(sim, { ...emptyActions(), killTarget: players[3].id, whoreTarget: players[3].id, doctorSave: players[3].id }, { round: 2, torturerPromoted: false });
+      assert(sim.every((p) => p.alive), "Doctor saving partner keeps partner and Whore alive");
+
+      sim = clonePlayers(players);
+      resolveNightCore(sim, { ...emptyActions(), killTarget: players[1].id, whoreTarget: players[3].id, doctorSave: players[1].id }, { round: 2, torturerPromoted: false });
+      assert(sim.every((p) => p.alive), "Doctor saving Whore keeps Whore and partner alive");
+
+      sim = clonePlayers(players);
+      out = resolveNightCore(sim, { ...emptyActions(), killTarget: players[1].id, whoreTarget: players[3].id, doctorSave: players[3].id }, { round: 2, torturerPromoted: false });
+      assert(!sim.find((p) => p.name === "W").alive && sim.find((p) => p.name === "P").alive, "Partner saved when Whore dies");
+      assert(out.events.some((e) => e.message === "Eliminated by the Mafia"), "Mafia death message exact");
+
+      sim = clonePlayers(players);
+      out = resolveNightCore(sim, { ...emptyActions(), killTarget: players[3].id, whoreTarget: players[3].id }, { round: 2, torturerPromoted: false });
+      assert(!sim.find((p) => p.name === "W").alive && !sim.find((p) => p.name === "P").alive, "Partner death pulls Whore");
+      assert(out.events.some((e) => e.message === "The Whore shares the fate of her partner"), "Whore fate message exact");
+
+      sim = clonePlayers(players);
+      out = resolveNightCore(sim, { ...emptyActions(), killTarget: players[1].id, whoreTarget: players[3].id }, { round: 2, torturerPromoted: false });
+      assert(out.events.some((e) => e.message === "Shares the fate of the Whore"), "Partner fate message exact");
+
+      const docA = make("doctor", "A");
+      const docB = make("doctor", "B");
+      const civ = make("civilian", "C");
+      assert(doctorTargets(docA.id, [docA, docB, civ], 1).some((p) => p.id === docB.id), "Doctor A can save Doctor B in round 1");
+      assert(!doctorTargets(docA.id, [docA, docB, civ], 1).some((p) => p.id === docA.id), "Doctor A cannot self-save in round 1");
+
+      players = [make("killer", "K"), make("torturer", "T"), make("civilian", "C")];
+      players[0].alive = false;
+      const promo = applyPromotion(players, false);
+      assert(promo.promoted.length === 1 && players[1].promoted, "Torturer promotion triggers when last Killer dies");
+      assert(torturerTargets(players).some((p) => p.role === "torturer"), "Torturer can target self");
+      assert(getWinner([make("killer", "K"), make("civilian", "C")]) === "mafia", "Mafia parity win");
+      assert(getWinner([make("civilian", "C")]) === "town", "Town wins when Mafia gone");
+      return true;
+    }
+
+    document.addEventListener("click", handleClick);
+    document.addEventListener("input", handleInput);
+    document.addEventListener("keydown", handleKey);
+    document.addEventListener("touchstart", () => {}, { passive: true });
+    document.addEventListener("touchmove", () => {}, { passive: true });
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("pointermove", handlePointerMove);
+    document.addEventListener("pointerup", handlePointerUp);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && wantsWakeLock) acquireWakeLock();
+    });
+
+    window.MAFIA_DEV = {
+      state,
+      runLogicTests,
+      resolveNightCore,
+      getWinner,
+      doctorTargets,
+      torturerTargets
+    };
+
+    createStars();
+    scheduleRender(true);
+  </script>
 </body>
 </html>
