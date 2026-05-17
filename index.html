@@ -3,7 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="A mobile-first Mafia moderator game for one phone, private role reveals, guided nights, voting, and local autosave.">
   <meta name="theme-color" content="#07050D">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="MAFIA">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
   <title>MAFIA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -178,6 +183,19 @@
       border: 1px solid var(--border);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.09), 0 14px 36px rgba(0,0,0,.32);
     }
+    body.low-blur .glass,
+    body.low-blur .glass-lite,
+    body.low-blur .btn-ghost {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background: rgba(20, 15, 33, .86);
+    }
+    body.motion-subtle .ambient::before,
+    body.motion-subtle .ambient::after,
+    body.motion-subtle .star,
+    body.motion-subtle .fab {
+      animation-duration: 20s !important;
+    }
 
     .logo-wrap { padding: 26px 6px 22px; text-align: center; }
     .logo {
@@ -197,6 +215,27 @@
       text-transform: uppercase;
       letter-spacing: .16em;
     }
+    .deck-stack {
+      position: relative;
+      width: 94px;
+      height: 64px;
+      margin: 18px auto 0;
+      contain: layout paint style;
+    }
+    .deck-card {
+      position: absolute;
+      inset: 8px 4px;
+      border-radius: 10px;
+      background:
+        repeating-linear-gradient(45deg, rgba(255,255,255,.08) 0 2px, transparent 2px 8px),
+        linear-gradient(145deg, #240814, #9A1028 58%, #190813);
+      border: 4px solid #E8D9B7;
+      box-shadow: 0 12px 28px rgba(0,0,0,.34);
+      transform-origin: 50% 90%;
+    }
+    .deck-card:nth-child(1) { transform: translate3d(-9px, 6px, 0) rotate(-9deg); opacity: .72; }
+    .deck-card:nth-child(2) { transform: translate3d(0, 0, 0) rotate(-2deg); opacity: .9; }
+    .deck-card:nth-child(3) { transform: translate3d(9px, -5px, 0) rotate(7deg); }
 
     .panel { border-radius: 24px; padding: 16px; margin-bottom: 14px; }
     .panel-tight { padding: 12px; }
@@ -309,6 +348,37 @@
     .notice.ok { color: #A8E8BF; border-color: rgba(34,176,96,.25); }
     .notice.warn { color: #F2D779; border-color: rgba(212,170,20,.24); }
     .notice.err { color: #FF9AAB; border-color: rgba(216,20,54,.28); }
+    .risk-meter {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 18px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+    }
+    .risk-orb {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      background: rgba(255,255,255,.06);
+    }
+    .risk-meter.ok .risk-orb { color: #A8E8BF; background: rgba(34,176,96,.14); }
+    .risk-meter.warn .risk-orb { color: #F2D779; background: rgba(212,170,20,.13); }
+    .risk-meter.err .risk-orb { color: #FF9AAB; background: rgba(216,20,54,.14); }
+    .risk-title { font-weight: 900; }
+    .risk-copy { margin-top: 3px; color: var(--text-2); font-size: .78rem; line-height: 1.32; }
+    .utility-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
 
     .player-list { display: grid; gap: 9px; }
     .person-row {
@@ -409,6 +479,26 @@
     }
     .role-mini-name { margin-top: 6px; font-weight: 800; font-size: .76rem; }
     .role-mini-count { margin-top: 3px; color: var(--text-2); font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; }
+    .role-compendium {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .role-info {
+      border-radius: 16px;
+      padding: 10px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+    .role-info-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+      font-size: .78rem;
+    }
+    .role-info-copy { margin-top: 6px; color: var(--text-2); font-size: .72rem; line-height: 1.28; }
     .stepper { display: grid; grid-template-columns: 38px 34px 38px; align-items: center; gap: 4px; }
     .stepper button {
       height: 38px;
@@ -491,6 +581,23 @@
       letter-spacing: .08em;
     }
     .phase-pill svg { width: 15px; height: 15px; }
+    .safe-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      color: #A8E8BF;
+      background: rgba(34,176,96,.10);
+      border: 1px solid rgba(34,176,96,.22);
+      font-size: .7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+    .safe-pill svg { width: 14px; height: 14px; }
 
     .bottom-actions {
       position: fixed;
@@ -541,6 +648,20 @@
       text-align: center;
       position: relative;
     }
+    .reveal-top {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: start;
+      text-align: left;
+    }
+    .reveal-reset {
+      min-height: 38px;
+      padding: 0 12px;
+      border-radius: 14px;
+      font-size: .72rem;
+    }
     .reveal-name {
       font-family: "Cormorant Garamond", Georgia, serif;
       font-size: 2.35rem;
@@ -551,10 +672,16 @@
     .reveal-count { color: var(--text-2); font-size: .8rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
     .reveal-hint { color: var(--text-2); font-size: .9rem; line-height: 1.4; }
     .card-scene {
+      display: block;
       width: min(70vw, 286px);
       max-width: 100%;
       aspect-ratio: 5 / 7;
       margin: 0 auto;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      appearance: none;
+      -webkit-appearance: none;
       perspective: 1300px;
       contain: layout paint style;
       animation: cardDeal .66s var(--spring) both;
@@ -765,6 +892,31 @@
       overflow-wrap: anywhere;
     }
     .vote-copy { margin-top: 8px; color: var(--text-2); line-height: 1.4; }
+    .pressure-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px;
+      margin-bottom: 14px;
+      border-radius: 22px;
+      border: 1px solid rgba(113,211,245,.18);
+      background: linear-gradient(135deg, rgba(113,211,245,.09), rgba(212,170,20,.06));
+      animation: rowIn .32s var(--spring) both;
+    }
+    .pressure-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      color: var(--cyan);
+      background: rgba(113,211,245,.12);
+      border: 1px solid rgba(113,211,245,.22);
+    }
+    .pressure-title { font-size: .72rem; color: var(--text-2); font-weight: 900; text-transform: uppercase; letter-spacing: .1em; }
+    .pressure-text { margin-top: 4px; font-weight: 800; line-height: 1.25; }
+    .pressure-card .icon-btn { width: 42px; height: 42px; flex: 0 0 42px; }
     .tally-list { display: grid; gap: 9px; margin-top: 12px; }
     .tally-row {
       display: grid;
@@ -987,6 +1139,7 @@
     }
     .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
     .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+    .tabs.three { grid-template-columns: repeat(3, 1fr); }
     .tab {
       min-height: 40px;
       border-radius: 14px;
@@ -1000,6 +1153,57 @@
     .count-box { border-radius: 16px; padding: 10px; text-align: center; background: rgba(0,0,0,.18); border: 1px solid rgba(255,255,255,.06); }
     .count-num { font-weight: 900; font-size: 1.2rem; }
     .count-label { margin-top: 3px; color: var(--text-2); font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; }
+    .dashboard-card {
+      border-radius: 20px;
+      padding: 13px;
+      margin-bottom: 10px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+    .dashboard-title { font-weight: 900; }
+    .dashboard-copy { margin-top: 5px; color: var(--text-2); font-size: .82rem; line-height: 1.36; }
+    .check-list { display: grid; gap: 8px; margin-top: 10px; }
+    .check-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 8px;
+      align-items: center;
+      color: var(--text-2);
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .check-item.done { color: #A8E8BF; }
+    .truth-gate {
+      display: grid;
+      place-items: center;
+      min-height: 190px;
+      padding: 18px;
+      border-radius: 22px;
+      text-align: center;
+      background: rgba(0,0,0,.22);
+      border: 1px dashed rgba(255,255,255,.14);
+    }
+    .truth-icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 20px;
+      margin: 0 auto 12px;
+      color: #A8E8BF;
+      background: rgba(34,176,96,.12);
+    }
+    .truth-icon svg { width: 28px; height: 28px; }
+    .hold-button {
+      margin-top: 14px;
+      width: 100%;
+      min-height: 52px;
+      border-radius: 16px;
+      color: #19100A;
+      background: linear-gradient(180deg, #F1C640, #B8920C);
+      font-weight: 900;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.38), 0 18px 34px rgba(184,146,12,.18);
+    }
 
     .undo {
       position: fixed;
@@ -1056,6 +1260,7 @@
       .card-value { font-size: 4.4rem; }
       .preset-grid { grid-template-columns: 1fr; }
       .preset-card { min-height: 74px; }
+      .utility-grid, .role-compendium { grid-template-columns: 1fr; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -1112,6 +1317,25 @@
       detective: { title: "Detective Wakes", icon: "search", glow: "rgba(104,136,208,.16)", script: "Detective, open your eyes. Point to one suspect. The narrator shows thumbs privately." }
     };
 
+    const DAY_PROMPTS = [
+      "Everyone names one person who got quieter after dawn.",
+      "Each player gives one sentence: who benefits if we rush?",
+      "Ask the two loudest players to accuse each other first.",
+      "Everyone points to the safest person, then explains why.",
+      "Make one full circle with no interruptions, then vote.",
+      "Ask who changed their story since the last round.",
+      "Let the quietest living player choose the first accusation.",
+      "Everyone gives a suspect and a reason without repeating names.",
+      "Pick two opposite reads and make the table defend one.",
+      "Before voting, ask what the Mafia wants the table to miss."
+    ];
+
+    const CODENAMES = [
+      "Raven", "Cipher", "Vesper", "Echo", "Mirage", "Sable", "Nova", "Ghost",
+      "Atlas", "Onyx", "Velvet", "Knox", "Lyric", "Dagger", "Halo", "Vale",
+      "Fable", "Slate", "Rune", "Iris", "Morrow", "Lux", "Noir", "Drift"
+    ];
+
     const ICON = {
       plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
       minus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg>',
@@ -1156,9 +1380,13 @@
       vote: null,
       events: [],
       history: [],
+      timeline: [],
       result: null,
       modal: null,
-      narratorTab: "roles",
+      narratorTab: "overview",
+      narratorTruthUnlocked: false,
+      dayPromptIndex: 0,
+      settings: { silent: false, lowBlur: false, motion: "cinematic" },
       undo: null,
       restoredAt: null,
       transitionKey: "setup"
@@ -1172,6 +1400,7 @@
     let wantsWakeLock = false;
     let dragSheet = null;
     let dragRaf = 0;
+    let holdTimer = 0;
     let persistQueued = false;
 
     const app = document.getElementById("app");
@@ -1294,6 +1523,68 @@
       return validation().level === "ok";
     }
 
+    function recommendedConfigForPlayerCount(count) {
+      if (count <= 4) return { killers: 1, torturers: 0, doctors: 0, detectives: 0, whore: false, joker: false };
+      if (count <= 6) return { killers: 1, torturers: 0, doctors: 1, detectives: 1, whore: false, joker: false };
+      if (count <= 8) return { killers: 2, torturers: 0, doctors: 1, detectives: 1, whore: false, joker: false };
+      if (count <= 11) return { killers: 2, torturers: 1, doctors: 1, detectives: 1, whore: true, joker: false };
+      return { killers: 3, torturers: 1, doctors: 2, detectives: 1, whore: true, joker: true };
+    }
+
+    function setupRiskProfile(config = state.config, players = state.players) {
+      const v = validation(config, players);
+      const mafiaSlots = config.killers + config.torturers;
+      const specials = config.torturers + config.doctors + config.detectives + (config.whore ? 1 : 0) + (config.joker ? 1 : 0);
+      const civs = civilianCount(config, players);
+      if (v.level === "err") return { level: "err", title: "Fix before dealing", text: v.text };
+      if (players.length < 5) return { level: "warn", title: "Tiny table", text: "Great for teaching, but reads are swingy and one vote can decide the room." };
+      if (mafiaSlots >= Math.max(1, civs + config.doctors + config.detectives - 1)) return { level: "warn", title: "Mafia pressure high", text: "The Mafia side is close to parity. Expect a fast, tense game." };
+      if (specials > Math.ceil(players.length / 2)) return { level: "warn", title: "Chaos-heavy setup", text: "More than half the table has powers. Fun, but harder for new players." };
+      if (civs >= Math.ceil(players.length / 2)) return { level: "ok", title: "Readable table", text: "Enough civilians remain for bluffing, pressure, and social deduction." };
+      return { level: "ok", title: "Balanced pressure", text: "The role mix has information, protection, and room for lies." };
+    }
+
+    function isPublicSafePhase() {
+      return state.phase === "day" || state.phase === "vote" || state.screen === "setup";
+    }
+
+    function dashboardSummary() {
+      const counts = liveCounts();
+      const publicSafe = isPublicSafePhase();
+      const objective = state.screen === "setup"
+        ? "Seat the table and deal when the setup meter is healthy."
+        : state.screen === "reveal"
+          ? "Pass the phone privately until every player has seen exactly one card."
+          : state.screen === "gameover"
+            ? "Read the final result, then replay with the same table or reset."
+            : state.phase === "night"
+              ? `Guide ${STEP_META[currentStep()] ? STEP_META[currentStep()].title : "the night"} and keep the phone hidden.`
+              : state.phase === "dawn"
+                ? "Announce only the dawn report. Keep private choices private."
+                : state.phase === "vote"
+                  ? "Run the vote. Confirm before any elimination becomes public."
+                  : "Watch the table, manage discussion, then start voting or night.";
+      const next = state.screen === "setup"
+        ? (isValidSetup() ? "Deal cards." : validation().text)
+        : state.screen === "reveal"
+          ? (state.cardFlipped ? "Pass to the next player." : "Let the current player tap their card.")
+          : state.screen === "gameover"
+            ? "Start a new game or replay with the same table."
+            : state.phase === "night"
+              ? (currentStep() ? `Resolve ${STEP_META[currentStep()].title}.` : "Resolve night.")
+              : state.phase === "dawn"
+                ? "Begin the next day."
+                : state.phase === "vote"
+                  ? "Finish ballots or resolve the tally."
+                  : "Start Vote when discussion is ready.";
+      return { counts, publicSafe, objective, next, phase: state.phase, screen: state.screen };
+    }
+
+    function discussionPrompt() {
+      const index = Math.abs((Number(state.dayPromptIndex) || 0) + state.round - 1) % DAY_PROMPTS.length;
+      return DAY_PROMPTS[index];
+    }
+
     function scheduleRender(resetScroll) {
       if (resetScroll) resetScrollNext = true;
       queuePersist();
@@ -1322,6 +1613,8 @@
       renderQueued = false;
       document.body.classList.toggle("night", state.phase === "night" || state.phase === "dawn" || state.screen === "reveal");
       document.body.classList.toggle("has-toast", Boolean(state.undo));
+      document.body.classList.toggle("low-blur", Boolean(state.settings.lowBlur));
+      document.body.classList.toggle("motion-subtle", state.settings.motion === "subtle");
       app.innerHTML = renderScreen();
       modalRoot.innerHTML = renderModal();
       toastRoot.innerHTML = renderToast();
@@ -1347,12 +1640,14 @@
         ? `<div class="player-list">${state.players.map((p, i) => renderSetupPlayer(p, i)).join("")}</div>`
         : `<div class="player-list">${[0,1,2].map(() => '<div class="skeleton"></div>').join("")}</div>`;
       const presetId = selectedPresetId();
+      const risk = setupRiskProfile();
       return `
         <section class="screen">
           <div class="logo-wrap">
             <div class="logo">MAFIA</div>
             <div class="suits">♠ &nbsp; ♥ &nbsp; ♦ &nbsp; ♣</div>
             <div class="kicker">One phone. Closed eyes. Bad alibis.</div>
+            <div class="deck-stack" aria-hidden="true"><span class="deck-card"></span><span class="deck-card"></span><span class="deck-card"></span></div>
           </div>
           <div class="panel glass">
             <div class="setup-topline">
@@ -1364,6 +1659,13 @@
               <button class="btn btn-gold" data-action="add-player">${icon("plus")} Add</button>
             </div>
             ${renderSetupNotice()}
+            <div class="utility-grid">
+              <button class="btn btn-ghost" data-action="quick-seats">${icon("users")} Quick 8</button>
+              <button class="btn btn-ghost" data-action="codenames">${icon("mask")} Codenames</button>
+              <button class="btn btn-ghost" data-action="shuffle-seats" ${state.players.length < 2 ? "disabled" : ""}>${icon("cards")} Shuffle</button>
+              <button class="btn btn-ghost" data-action="recommend-roles">${icon("check")} Recommend</button>
+              <button class="btn btn-ghost" data-action="open-settings">${icon("panel")} Settings</button>
+            </div>
             <div style="height:12px"></div>
             ${players}
           </div>
@@ -1384,6 +1686,17 @@
               ${renderToggle("joker", "Joker", "Neutral")}
             </div>
             ${renderDeckPreview()}
+          </div>
+          <div class="risk-meter ${risk.level}">
+            <div class="risk-orb">${icon(risk.level === "ok" ? "check" : "info")}</div>
+            <div>
+              <div class="risk-title">${esc(risk.title)}</div>
+              <div class="risk-copy">${esc(risk.text)}</div>
+            </div>
+          </div>
+          <div class="panel glass panel-tight">
+            <div class="section-label">${icon("info")} Role guide</div>
+            ${renderRoleCompendium()}
           </div>
           <div class="validation ${v.level}" aria-live="polite">${icon(v.level === "ok" ? "check" : "info")} <span>${esc(v.text)}</span></div>
           <button class="btn btn-primary btn-block" data-action="start-game" ${isValidSetup() ? "" : "disabled"}>${icon("cards")} Deal Cards &rarr;</button>
@@ -1412,6 +1725,18 @@
             return `<div class="role-mini"><div class="role-mini-value">${role.value}${role.suit}</div><div class="role-mini-name">${role.label}</div><div class="role-mini-count">${count} card${count === 1 ? "" : "s"}</div></div>`;
           }).join("")}
         </div>`;
+    }
+
+    function renderRoleCompendium() {
+      const order = ["killer", "doctor", "detective", "civilian", "torturer", "whore", "joker"];
+      return `<div class="role-compendium">${order.map((roleId) => {
+        const role = ROLE[roleId];
+        return `
+          <div class="role-info">
+            <div class="role-info-top">${renderRolePip(role)}<span>${role.label}</span></div>
+            <div class="role-info-copy">${esc(role.description)}</div>
+          </div>`;
+      }).join("")}</div>`;
     }
 
     function renderSetupPlayer(player, index) {
@@ -1462,9 +1787,12 @@
       const nextName = last ? "Narrator" : state.players[state.revealIndex + 1].name;
       return `
         <section class="screen reveal-screen">
-          <div>
-            <div class="reveal-count">${state.revealIndex + 1} of ${state.players.length}</div>
-            <div class="reveal-name">${esc(player.name)}</div>
+          <div class="reveal-top">
+            <div>
+              <div class="reveal-count">${state.revealIndex + 1} of ${state.players.length}</div>
+              <div class="reveal-name">${esc(player.name)}</div>
+            </div>
+            <button class="btn btn-ghost reveal-reset" data-action="new-game">${icon("x")} Reset</button>
           </div>
           <button class="card-scene" style="--deal-index:${state.revealIndex}" data-action="flip-card" aria-label="Reveal card for ${esc(player.name)}">
             <div class="playing-card ${state.cardFlipped ? "flipped" : ""}">
@@ -1513,6 +1841,7 @@
             </div>
             <div class="phase-pill">${icon(iconName)} ${phaseLabel}</div>
           </div>
+          ${isPublicSafePhase() ? `<div class="safe-pill">${icon("shield")} Public safe - living roles hidden</div>` : ""}
           ${state.phase === "night" ? `<div class="progress-dots">${state.night.steps.map((_, i) => `<span class="dot ${i < state.night.index ? "done" : i === state.night.index ? "active" : ""}"></span>`).join("")}</div>` : ""}
           ${state.phase === "vote" && state.vote && state.vote.voters.length ? `<div class="progress-dots">${state.vote.voters.map((_, i) => `<span class="dot ${i < state.vote.index ? "done" : i === state.vote.index ? "active" : ""}"></span>`).join("")}</div>` : ""}
         </header>`;
@@ -1528,6 +1857,14 @@
             <div class="vote-kicker">Discussion</div>
             <div class="vote-name">Find the lie</div>
             <div class="vote-copy">Let the table talk. When accusations settle, start a structured phone vote or go straight to night with no elimination.</div>
+          </div>
+          <div class="pressure-card glass-lite">
+            <div class="pressure-mark">${icon("sun")}</div>
+            <div>
+              <div class="pressure-title">Pressure prompt</div>
+              <div class="pressure-text">${esc(discussionPrompt())}</div>
+            </div>
+            <button class="icon-btn" data-action="next-prompt" aria-label="New pressure prompt">${icon("panel")}</button>
           </div>
           <div class="panel glass">
             <div class="section-label">${icon("users")} Alive</div>
@@ -1586,6 +1923,9 @@
         : summary.tie
           ? "The highest vote is tied. The table can revote or go to night."
           : "No valid votes were cast. Continue to night or restart the vote.";
+      const tieActions = summary.tie
+        ? `<button class="btn btn-ghost" data-action="skip-vote">No Elimination</button><button class="btn btn-primary" data-action="random-tied">${icon("cards")} Random Tied</button>`
+        : "";
       return `
         <section class="screen">
           ${renderHeader("Vote", "users", "Table result")}
@@ -1606,7 +1946,7 @@
           <div class="bottom-actions">
             <div class="bottom-inner">
               <button class="btn btn-ghost" data-action="restart-vote">Revote</button>
-              ${winner ? `<button class="btn btn-danger" data-action="open-eliminate" data-id="${winner.id}">${icon("skull")} Confirm</button>` : `<button class="btn btn-primary" data-action="skip-vote">${icon("moon")} Begin Night</button>`}
+              ${winner ? `<button class="btn btn-danger" data-action="open-final-words" data-id="${winner.id}">${icon("skull")} Confirm</button>` : tieActions || `<button class="btn btn-primary" data-action="skip-vote">${icon("moon")} Begin Night</button>`}
             </div>
           </div>
         </section>`;
@@ -1687,7 +2027,7 @@
         <div class="bottom-actions">
           <div class="bottom-inner">
             <button class="btn btn-ghost" data-action="skip-step">Skip</button>
-            <button class="btn btn-primary" data-action="next-step">${stepId === "detective" ? "Finish Night" : "Next"} &rarr;</button>
+            <button class="btn btn-primary" data-action="next-step" ${stepCanAdvance(stepId) ? "" : "disabled"}>${stepId === "detective" ? "Finish Night" : "Next"} &rarr;</button>
           </div>
         </div>`;
     }
@@ -1718,6 +2058,17 @@
       if (stepId === "doctor") return stepDoctor();
       if (stepId === "detective") return stepDetective();
       return "";
+    }
+
+    function stepCanAdvance(stepId = currentStep(), actions = state.night.actions) {
+      if (!stepId) return true;
+      if (stepId === "joker") return !actions.jokerAwake || Boolean(actions.jokerSuggestion);
+      if (stepId === "kill") return Boolean(actions.killTarget);
+      if (stepId === "torturer") return Boolean(actions.tortureMode && actions.tortureTarget);
+      if (stepId === "whore") return Boolean(actions.whoreTarget);
+      if (stepId === "doctor") return Boolean(actions.doctorSave);
+      if (stepId === "detective") return Boolean(actions.detectiveCheck);
+      return true;
     }
 
     function nightTargetList(players, selectedId) {
@@ -1820,9 +2171,31 @@
           <div class="winner-mark">${icon(town ? "shield" : "blade")}</div>
           <div class="winner-title">${town ? "Town Wins" : "Mafia Wins"}</div>
           <div class="winner-copy">${town ? "All Killers and Torturers are gone. The town survives the table." : "The Mafia now equals or outnumbers the Town. Control is gone."}</div>
+          ${renderEndgameTimeline()}
           ${TEAM_ORDER.filter((team) => state.players.some((p) => team.roles.includes(p.role))).map(renderTeamSection).join("")}
-          <button class="btn btn-primary btn-block" data-action="new-game">${icon("cards")} New Game</button>
+          <div class="bottom-inner" style="position:static;width:100%;margin-top:14px">
+            <button class="btn btn-ghost" data-action="new-game">${icon("cards")} Same Table</button>
+            <button class="btn btn-primary" data-action="remix-roles">${icon("cards")} Remix Roles</button>
+          </div>
         </section>`;
+    }
+
+    function renderEndgameTimeline() {
+      if (!state.timeline.length) return "";
+      return `
+        <div class="team-section panel glass">
+          <div class="section-label">${icon("log")} Replay</div>
+          <div class="event-list">
+            ${state.timeline.map((item, index) => `
+              <div class="event-row glass-lite info" style="--i:${index}">
+                <div class="event-icon">${icon(item.kind === "elimination" ? "skull" : item.kind === "vote" ? "users" : "log")}</div>
+                <div>
+                  <div class="event-title">R${item.round} - ${esc(item.title)}</div>
+                  <div class="event-msg">${esc(item.detail)}</div>
+                </div>
+              </div>`).join("")}
+          </div>
+        </div>`;
     }
 
     function renderTeamSection(team) {
@@ -1837,7 +2210,9 @@
     function renderModal() {
       if (!state.modal) return "";
       if (state.modal.type === "eliminate") return renderEliminateModal();
+      if (state.modal.type === "finalWords") return renderFinalWordsModal();
       if (state.modal.type === "narrator") return renderNarratorModal();
+      if (state.modal.type === "settings") return renderSettingsModal();
       if (state.modal.type === "reset") return renderResetModal();
       return "";
     }
@@ -1859,6 +2234,30 @@
         </div>`;
     }
 
+    function renderFinalWordsModal() {
+      const player = byId(state.modal.id);
+      if (!player) return "";
+      return `
+        <div class="overlay" data-action="modal-backdrop">
+          <div class="sheet glass" data-sheet role="dialog" aria-modal="true" aria-label="Final words">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">Final words</div>
+            <p class="muted">${esc(player.name)} gets one last short statement before the table confirms the elimination. Keep it quick, dramatic, and public.</p>
+            <div class="result-banner glass-lite">
+              ${icon("skull")}
+              <div>
+                <div class="result-title">${esc(player.name)} is on trial</div>
+                <div class="result-sub">When the statement ends, confirm the elimination and reveal the boneyard role.</div>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button class="btn btn-ghost" data-action="close-modal">Cancel</button>
+              <button class="btn btn-danger" data-action="open-eliminate" data-id="${player.id}">${icon("skull")} Continue</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
     function renderResetModal() {
       return `
         <div class="overlay" data-action="modal-backdrop">
@@ -1874,20 +2273,50 @@
         </div>`;
     }
 
+    function renderSettingsModal() {
+      return `
+        <div class="overlay" data-action="modal-backdrop">
+          <div class="sheet glass" data-sheet role="dialog" aria-modal="true" aria-label="Game settings">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">Settings</div>
+            <p class="muted">Keep these lightweight. They affect this device only.</p>
+            <div class="config-list">
+              <button class="config-row" data-action="toggle-setting" data-key="silent" aria-pressed="${state.settings.silent}">
+                <div style="text-align:left"><div class="config-name">Silent table</div><div class="config-meta">Disables synthesized sounds and vibration.</div></div>
+                <span class="toggle ${state.settings.silent ? "on" : ""}"><span></span></span>
+              </button>
+              <button class="config-row" data-action="toggle-setting" data-key="lowBlur" aria-pressed="${state.settings.lowBlur}">
+                <div style="text-align:left"><div class="config-name">Performance glass</div><div class="config-meta">Removes expensive blur on weaker phones.</div></div>
+                <span class="toggle ${state.settings.lowBlur ? "on" : ""}"><span></span></span>
+              </button>
+              <button class="config-row" data-action="cycle-motion">
+                <div style="text-align:left"><div class="config-name">Motion</div><div class="config-meta">${state.settings.motion === "subtle" ? "Subtle transitions" : "Cinematic transitions"}</div></div>
+                <div class="phase-pill">${state.settings.motion}</div>
+              </button>
+            </div>
+            <div class="modal-actions">
+              <button class="btn btn-ghost" data-action="clear-save">${icon("x")} Clear Save</button>
+              <button class="btn btn-primary" data-action="close-modal">${icon("check")} Done</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
     function renderNarratorModal() {
       const counts = liveCounts();
-      const body = state.narratorTab === "roles" ? renderNarratorRoles() : renderNightLog();
+      const body = state.narratorTab === "roles" ? renderNarratorRoles() : state.narratorTab === "log" ? renderNightLog() : renderNarratorOverview();
       return `
         <div class="overlay" data-action="modal-backdrop">
           <div class="sheet glass" data-sheet role="dialog" aria-modal="true" aria-label="Narrator panel">
             <div class="sheet-handle"></div>
-            <div class="sheet-title">Narrator Panel</div>
+            <div class="sheet-title">Host Dashboard</div>
             <div class="count-grid">
               <div class="count-box"><div class="count-num">${counts.mafia}</div><div class="count-label">Mafia</div></div>
               <div class="count-box"><div class="count-num">${counts.town}</div><div class="count-label">Town</div></div>
               <div class="count-box"><div class="count-num">${counts.alive}</div><div class="count-label">Alive</div></div>
             </div>
-            <div class="tabs">
+            <div class="tabs three">
+              <button class="tab ${state.narratorTab === "overview" ? "active" : ""}" data-action="narrator-tab" data-tab="overview">Now</button>
               <button class="tab ${state.narratorTab === "roles" ? "active" : ""}" data-action="narrator-tab" data-tab="roles">Roles</button>
               <button class="tab ${state.narratorTab === "log" ? "active" : ""}" data-action="narrator-tab" data-tab="log">Night Log</button>
             </div>
@@ -1897,7 +2326,43 @@
         </div>`;
     }
 
+    function renderNarratorOverview() {
+      const summary = dashboardSummary();
+      const nightSteps = state.night.steps.length
+        ? `<div class="check-list">${state.night.steps.map((step, index) => `<div class="check-item ${index < state.night.index ? "done" : ""}">${icon(index < state.night.index ? "check" : STEP_META[step].icon)}<span>${esc(STEP_META[step].title)}${index === state.night.index ? " - current" : ""}</span></div>`).join("")}</div>`
+        : `<div class="dashboard-copy">No night checklist is active yet.</div>`;
+      return `
+        <div class="dashboard-card">
+          <div class="dashboard-title">${summary.publicSafe ? `${icon("shield")} Public-safe surface` : `${icon("info")} Private host surface`}</div>
+          <div class="dashboard-copy">${summary.publicSafe ? "You can show the table this phase. Living roles stay hidden." : "Keep this panel pointed away from players unless role truth is gated."}</div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-title">Objective</div>
+          <div class="dashboard-copy">${esc(summary.objective)}</div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-title">Next action</div>
+          <div class="dashboard-copy">${esc(summary.next)}</div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-title">Night checklist</div>
+          ${nightSteps}
+        </div>
+        <button class="btn btn-ghost btn-block" data-action="open-settings">${icon("panel")} Settings</button>`;
+    }
+
     function renderNarratorRoles() {
+      if (!state.narratorTruthUnlocked) {
+        return `
+          <div class="truth-gate">
+            <div>
+              <div class="truth-icon">${icon("shield")}</div>
+              <div class="dashboard-title">Role truth is locked</div>
+              <div class="dashboard-copy">Hold the button until it unlocks. This prevents accidental role leaks when the phone is facing the table.</div>
+              <button class="hold-button" data-action="hold-truth">Hold to reveal roles</button>
+            </div>
+          </div>`;
+      }
       return state.players.map((player, i) => {
         const controls = player.alive ? `
           <div class="row-sub">
@@ -1992,6 +2457,63 @@
       scheduleRender();
     }
 
+    function quickSeats(count = 8) {
+      if (state.players.length) {
+        state.setupNotice = { level: "warn", text: "Quick seats only runs on an empty table." };
+        scheduleRender();
+        return;
+      }
+      state.players = Array.from({ length: count }, (_, index) => ({
+        id: uid(),
+        name: `Seat ${index + 1}`,
+        role: null,
+        alive: true,
+        canTalk: true,
+        canVote: true,
+        promoted: false
+      }));
+      state.config = recommendedConfigForPlayerCount(count);
+      state.preset = selectedPresetId();
+      state.setupNotice = { level: "ok", text: `${count} seats added with a recommended role mix.` };
+      pulse("tap");
+      scheduleRender();
+    }
+
+    function applyCodenames() {
+      if (!state.players.length) quickSeats(8);
+      const names = CODENAMES.slice();
+      shuffle(names);
+      state.players = state.players.map((player, index) => ({
+        ...player,
+        name: names[index] || `Alias ${index + 1}`
+      }));
+      state.currentName = "";
+      state.setupNotice = { level: "ok", text: `${state.players.length} codenames assigned. Rename anyone before dealing.` };
+      pulse("tap");
+      scheduleRender();
+    }
+
+    function shuffleSeats() {
+      if (state.players.length < 2) return;
+      shuffle(state.players);
+      state.setupNotice = { level: "ok", text: "Seat order shuffled before the deal." };
+      pulse("tap");
+      scheduleRender();
+    }
+
+    function recommendRoles() {
+      if (state.players.length < 3) {
+        state.setupNotice = { level: "warn", text: "Add at least 3 players before role recommendations." };
+        scheduleRender();
+        return;
+      }
+      state.config = recommendedConfigForPlayerCount(state.players.length);
+      state.preset = selectedPresetId();
+      state.setupNotice = { level: "ok", text: `Recommended roles for ${state.players.length} players applied.` };
+      pulse("tap");
+      scheduleRender();
+    }
+
     function startGame() {
       if (!isValidSetup()) return;
       clearUndo();
@@ -2017,9 +2539,13 @@
       state.torturerPromoted = false;
       state.events = [];
       state.history = [];
+      state.timeline = [];
       state.vote = null;
       state.result = null;
       state.modal = null;
+      state.narratorTab = "overview";
+      state.narratorTruthUnlocked = false;
+      state.dayPromptIndex = randomInt(DAY_PROMPTS.length);
       state.setupNotice = null;
       wantsWakeLock = true;
       acquireWakeLock();
@@ -2127,6 +2653,34 @@
       };
     }
 
+    function recordTimeline(kind, title, detail) {
+      state.timeline.push({
+        round: state.round,
+        phase: state.phase,
+        kind,
+        title,
+        detail
+      });
+    }
+
+    function openFinalWords(id) {
+      const player = byId(id);
+      if (!player || !player.alive) return;
+      state.modal = { type: "finalWords", id };
+      pulse("tap");
+      scheduleRender();
+    }
+
+    function randomTiedEliminate() {
+      const summary = voteSummary();
+      if (!summary.tie) return;
+      const leaders = summary.rows.filter((row) => row.count === summary.highest);
+      if (!leaders.length) return;
+      const picked = leaders[randomInt(leaders.length)];
+      recordTimeline("vote", "Tie broken by random draw", `${leaders.map((row) => row.name).join(", ")} were tied. ${picked.name} was drawn.`);
+      openFinalWords(picked.id);
+    }
+
     function startNight() {
       clearUndo();
       state.vote = null;
@@ -2177,6 +2731,11 @@
     }
 
     function nextStep() {
+      if (!stepCanAdvance()) {
+        pulse("tap");
+        scheduleRender();
+        return;
+      }
       state.night.index += 1;
       if (state.night.index >= state.night.steps.length) {
         resolveNight();
@@ -2206,6 +2765,7 @@
       state.torturerPromoted = outcome.torturerPromoted;
       state.events = outcome.events.length ? outcome.events : [{ kind: "info", icon: "moon", title: "Quiet night", message: "No public result was announced." }];
       state.history.push({ round: state.round, events: state.events.map((e) => ({ ...e })) });
+      recordTimeline("night", `Night ${state.round} resolved`, state.events.map((event) => event.title).join(" | "));
       const winner = getWinner(state.players);
       if (winner) {
         finishGame(winner);
@@ -2339,6 +2899,7 @@
 
     function beginDay() {
       state.round += 1;
+      state.dayPromptIndex = (state.dayPromptIndex + 1) % DAY_PROMPTS.length;
       navigate("game", "day");
     }
 
@@ -2357,6 +2918,11 @@
       player.alive = false;
       const promotion = applyPromotion(state.players, state.torturerPromoted);
       state.torturerPromoted = promotion.torturerPromoted;
+      const summary = voteSummary();
+      if (summary.rows.length) {
+        recordTimeline("vote", `${player.name} was voted out`, summary.rows.map((row) => `${row.name}: ${row.count}`).join(", "));
+      }
+      recordTimeline("elimination", `${player.name} eliminated`, `${ROLE[player.role].label} entered the boneyard.`);
       state.undo = {
         playerId: player.id,
         role: player.role,
@@ -2448,13 +3014,68 @@
       state.vote = null;
       state.events = [];
       state.history = [];
+      state.timeline = [];
       state.result = null;
       state.modal = null;
+      state.narratorTab = "overview";
+      state.narratorTruthUnlocked = false;
+      state.dayPromptIndex = 0;
       state.setupNotice = { level: "ok", text: "New game ready. Deal again when the table is set." };
       state.restoredAt = null;
       wantsWakeLock = false;
       releaseWakeLock();
       navigate("setup", "setup");
+    }
+
+    function clearSavedGame() {
+      try { window.localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+      const settings = { ...state.settings };
+      state.screen = "setup";
+      state.phase = "setup";
+      state.players = [];
+      state.config = { ...DEFAULT_CONFIG };
+      state.preset = "classic";
+      state.currentName = "";
+      state.revealIndex = 0;
+      state.cardFlipped = false;
+      state.round = 1;
+      state.torturerPromoted = false;
+      state.night = { steps: [], index: 0, actions: emptyActions() };
+      state.vote = null;
+      state.events = [];
+      state.history = [];
+      state.timeline = [];
+      state.result = null;
+      state.undo = null;
+      state.narratorTab = "overview";
+      state.narratorTruthUnlocked = false;
+      state.dayPromptIndex = 0;
+      state.settings = settings;
+      state.setupNotice = { level: "ok", text: "Saved game cleared from this device." };
+      state.modal = null;
+      wantsWakeLock = false;
+      releaseWakeLock();
+      pulse("tap");
+      navigate("setup", "setup");
+    }
+
+    function remixRoles() {
+      clearUndo();
+      state.players = state.players.map((p) => ({
+        id: uid(),
+        name: p.name,
+        role: null,
+        alive: true,
+        canTalk: true,
+        canVote: true,
+        promoted: false
+      }));
+      if (isValidSetup()) {
+        startGame();
+      } else {
+        state.setupNotice = { level: "warn", text: "Table restored, but setup needs adjustment before remixing." };
+        navigate("setup", "setup");
+      }
     }
 
     function clonePlayers(list) {
@@ -2496,8 +3117,12 @@
           } : null,
           events: state.events.map((event) => ({ ...event })),
           history: state.history.map((round) => ({ round: round.round, events: round.events.map((event) => ({ ...event })) })),
+          timeline: state.timeline.map((item) => ({ ...item })),
           result: state.result,
           narratorTab: state.narratorTab,
+          narratorTruthUnlocked: false,
+          dayPromptIndex: state.dayPromptIndex,
+          settings: { ...state.settings },
           transitionKey: state.transitionKey
         };
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: SAVE_VERSION, savedAt: Date.now(), state: safeState }));
@@ -2541,9 +3166,15 @@
         }))
         .slice(0, 24);
       const config = sanitizeConfig(saved.config);
-      const phase = ["setup", "reveal", "day", "vote", "night", "dawn", "over"].includes(saved.phase) ? saved.phase : "setup";
-      const screen = ["setup", "reveal", "game", "gameover"].includes(saved.screen) ? saved.screen : "setup";
-      const revealIndex = Math.max(0, Math.min(Number(saved.revealIndex) || 0, Math.max(players.length - 1, 0)));
+      let phase = ["setup", "reveal", "day", "vote", "night", "dawn", "over"].includes(saved.phase) ? saved.phase : "setup";
+      let screen = ["setup", "reveal", "game", "gameover"].includes(saved.screen) ? saved.screen : "setup";
+      let revealIndex = Math.max(0, Math.min(Number(saved.revealIndex) || 0, Math.max(players.length - 1, 0)));
+      const hasDealtRoles = players.length > 0 && players.every((player) => ROLE[player.role]);
+      if (screen !== "setup" && !hasDealtRoles) {
+        screen = "setup";
+        phase = "setup";
+        revealIndex = 0;
+      }
       const vote = saved.vote && Array.isArray(saved.vote.voters)
         ? { voters: saved.vote.voters.filter((id) => players.some((p) => p.id === id)), index: Math.max(0, Number(saved.vote.index) || 0), ballots: saved.vote.ballots && typeof saved.vote.ballots === "object" ? { ...saved.vote.ballots } : {} }
         : null;
@@ -2563,9 +3194,13 @@
         vote,
         events: Array.isArray(saved.events) ? saved.events.map(sanitizeEvent).filter(Boolean) : [],
         history: Array.isArray(saved.history) ? saved.history.map(sanitizeHistoryRound).filter(Boolean) : [],
+        timeline: Array.isArray(saved.timeline) ? saved.timeline.map(sanitizeTimelineItem).filter(Boolean) : [],
         result: saved.result === "town" || saved.result === "mafia" ? saved.result : null,
         modal: null,
-        narratorTab: saved.narratorTab === "log" ? "log" : "roles",
+        narratorTab: ["overview", "roles", "log"].includes(saved.narratorTab) ? saved.narratorTab : "overview",
+        narratorTruthUnlocked: false,
+        dayPromptIndex: Math.max(0, Math.min(DAY_PROMPTS.length - 1, Number(saved.dayPromptIndex) || 0)),
+        settings: sanitizeSettings(saved.settings),
         undo: null,
         restoredAt: null,
         transitionKey: typeof saved.transitionKey === "string" ? saved.transitionKey : `${screen}:${phase}`
@@ -2602,6 +3237,26 @@
       };
     }
 
+    function sanitizeTimelineItem(item) {
+      if (!item || typeof item !== "object") return null;
+      return {
+        round: Math.max(1, Number(item.round) || 1),
+        phase: normalizeName(item.phase) || "game",
+        kind: normalizeName(item.kind) || "event",
+        title: normalizeName(item.title) || "Event",
+        detail: normalizeName(item.detail)
+      };
+    }
+
+    function sanitizeSettings(settings) {
+      const source = settings && typeof settings === "object" ? settings : {};
+      return {
+        silent: Boolean(source.silent),
+        lowBlur: Boolean(source.lowBlur),
+        motion: source.motion === "subtle" ? "subtle" : "cinematic"
+      };
+    }
+
     async function ensureAudio() {
       const Ctx = window.AudioContext || window.webkitAudioContext;
       if (!Ctx) return null;
@@ -2611,6 +3266,7 @@
     }
 
     async function tone(freqA, freqB, duration, type, gainValue) {
+      if (state.settings.silent) return;
       const ctx = await ensureAudio();
       if (!ctx) return;
       const osc = ctx.createOscillator();
@@ -2631,6 +3287,7 @@
     }
 
     function pulse(kind) {
+      if (state.settings.silent) return;
       vibrate(8);
       if (kind === "flip") { tone(700, 180, .09, "sine", .09); return; }
       if (kind === "night") { chord([[392, 330], [330, 262], [262, 196]], .62, "sine", .055); return; }
@@ -2641,6 +3298,7 @@
     }
 
     function vibrate(pattern) {
+      if (state.settings.silent) return;
       if ("vibrate" in navigator) navigator.vibrate(pattern);
     }
 
@@ -2685,6 +3343,15 @@
       if (action === "modal-backdrop" && event.target !== actionable) return;
       if (action === "add-player") addPlayer();
       if (action === "remove-player") { state.players = state.players.filter((p) => p.id !== actionable.dataset.id); state.setupNotice = null; pulse("tap"); scheduleRender(); }
+      if (action === "quick-seats") quickSeats(8);
+      if (action === "codenames") applyCodenames();
+      if (action === "shuffle-seats") shuffleSeats();
+      if (action === "recommend-roles") recommendRoles();
+      if (action === "open-settings") { state.modal = { type: "settings" }; pulse("tap"); scheduleRender(); }
+      if (action === "toggle-setting") { state.settings[actionable.dataset.key] = !state.settings[actionable.dataset.key]; pulse("tap"); scheduleRender(); }
+      if (action === "cycle-motion") { state.settings.motion = state.settings.motion === "subtle" ? "cinematic" : "subtle"; pulse("tap"); scheduleRender(); }
+      if (action === "clear-save") clearSavedGame();
+      if (action === "next-prompt") { state.dayPromptIndex = (state.dayPromptIndex + 1) % DAY_PROMPTS.length; pulse("tap"); scheduleRender(); }
       if (action === "apply-preset") applyPreset(actionable.dataset.preset);
       if (action === "config-step") setConfigStep(actionable.dataset.key, Number(actionable.dataset.delta));
       if (action === "config-toggle") { state.config[actionable.dataset.key] = !state.config[actionable.dataset.key]; state.preset = selectedPresetId(); state.setupNotice = null; pulse("tap"); scheduleRender(); }
@@ -2695,13 +3362,15 @@
       if (action === "cast-vote") castVote(actionable.dataset.id || null);
       if (action === "restart-vote") startVote();
       if (action === "cancel-vote") cancelVote();
+      if (action === "random-tied") randomTiedEliminate();
+      if (action === "open-final-words") openFinalWords(actionable.dataset.id);
       if (action === "open-eliminate") openEliminate(actionable.dataset.id);
       if (action === "confirm-eliminate") confirmEliminate(actionable.dataset.id);
       if (action === "undo-eliminate") undoEliminate();
       if (action === "skip-vote" || action === "start-night") startNight();
-      if (action === "open-narrator") { state.modal = { type: "narrator" }; pulse("tap"); scheduleRender(); }
-      if (action === "close-modal" || action === "modal-backdrop") { state.modal = null; pulse("tap"); scheduleRender(); }
-      if (action === "narrator-tab") { state.narratorTab = actionable.dataset.tab; pulse("tap"); scheduleRender(); }
+      if (action === "open-narrator") { state.modal = { type: "narrator" }; state.narratorTab = "overview"; state.narratorTruthUnlocked = false; pulse("tap"); scheduleRender(); }
+      if (action === "close-modal" || action === "modal-backdrop") { state.modal = null; state.narratorTruthUnlocked = false; pulse("tap"); scheduleRender(); }
+      if (action === "narrator-tab") { state.narratorTab = actionable.dataset.tab; if (state.narratorTab !== "roles") state.narratorTruthUnlocked = false; pulse("tap"); scheduleRender(); }
       if (action === "toggle-talk") { const p = byId(actionable.dataset.id); if (p) p.canTalk = !p.canTalk; pulse("tap"); scheduleRender(); }
       if (action === "toggle-vote") { const p = byId(actionable.dataset.id); if (p) p.canVote = !p.canVote; pulse("tap"); scheduleRender(); }
       if (action === "night-pick") pickNightTarget(actionable.dataset.id);
@@ -2713,6 +3382,7 @@
       if (action === "begin-day") beginDay();
       if (action === "new-game") { state.modal = { type: "reset" }; pulse("tap"); scheduleRender(); }
       if (action === "confirm-reset") resetGame();
+      if (action === "remix-roles") remixRoles();
     }
 
     function handleInput(event) {
@@ -2729,6 +3399,16 @@
     }
 
     function handlePointerDown(event) {
+      const truthButton = event.target.closest('[data-action="hold-truth"]');
+      if (truthButton) {
+        window.clearTimeout(holdTimer);
+        holdTimer = window.setTimeout(() => {
+          state.narratorTruthUnlocked = true;
+          pulse("tap");
+          scheduleRender();
+        }, 900);
+        return;
+      }
       const sheet = event.target.closest("[data-sheet]");
       if (!sheet) return;
       dragSheet = { sheet, startY: event.clientY, currentY: 0, pointerId: event.pointerId };
@@ -2748,6 +3428,8 @@
     }
 
     function handlePointerUp(event) {
+      window.clearTimeout(holdTimer);
+      holdTimer = 0;
       if (!dragSheet || dragSheet.pointerId !== event.pointerId) return;
       const shouldClose = dragSheet.currentY > 90;
       dragSheet.sheet.style.transform = "";
@@ -2756,6 +3438,13 @@
         state.modal = null;
         scheduleRender();
       }
+    }
+
+    function handlePointerCancel() {
+      window.clearTimeout(holdTimer);
+      holdTimer = 0;
+      if (dragSheet && dragSheet.sheet) dragSheet.sheet.style.transform = "";
+      dragSheet = null;
     }
 
     function runLogicTests() {
@@ -2805,12 +3494,18 @@
 
       players = [make("killer", "Alex"), make("doctor", "alex"), make("civilian", "Mara")];
       assert(validation({ ...DEFAULT_CONFIG, detectives: 0 }, players).text === "Player names must be unique.", "Duplicate names are rejected");
+      assert(recommendedConfigForPlayerCount(8).killers === 2, "Eight-player recommendation adds second Killer");
+      assert(setupRiskProfile({ killers: 2, torturers: 1, doctors: 0, detectives: 0, whore: false, joker: false }, [make("killer"), make("killer"), make("torturer"), make("civilian"), make("civilian")]).level === "err", "Risk profile surfaces invalid pressure");
+      assert(dashboardSummary().objective.length > 0 && dashboardSummary().next.length > 0, "Dashboard summary always has guidance");
+      assert(discussionPrompt().length > 20, "Discussion prompt provides usable table pressure");
 
       players = [make("killer", "K"), make("civilian", "A"), make("civilian", "B")];
       let vote = { voters: [players[0].id, players[1].id, players[2].id], index: 3, ballots: { [players[0].id]: players[1].id, [players[1].id]: players[2].id, [players[2].id]: players[1].id } };
       assert(voteSummary(vote, players).winnerId === players[1].id, "Vote winner resolves by highest tally");
       vote = { voters: [players[0].id, players[1].id], index: 2, ballots: { [players[0].id]: players[1].id, [players[1].id]: players[0].id } };
       assert(voteSummary(vote, players).tie, "Voting tie blocks automatic elimination");
+      assert(!stepCanAdvance("kill", emptyActions()), "Kill step requires a target unless skipped");
+      assert(stepCanAdvance("kill", { ...emptyActions(), killTarget: players[1].id }), "Kill step advances after target");
 
       const restored = sanitizeSavedState({ screen: "reveal", phase: "reveal", players, config: DEFAULT_CONFIG, revealIndex: 999, cardFlipped: true });
       assert(restored && restored.revealIndex === 2 && restored.cardFlipped === false, "Saved reveal state hides card after refresh");
@@ -2825,6 +3520,7 @@
     document.addEventListener("pointerdown", handlePointerDown);
     document.addEventListener("pointermove", handlePointerMove);
     document.addEventListener("pointerup", handlePointerUp);
+    document.addEventListener("pointercancel", handlePointerCancel);
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible" && wantsWakeLock) acquireWakeLock();
     });
@@ -2839,12 +3535,19 @@
       validation,
       voteSummary,
       createVoteState,
-      sanitizeSavedState
+      sanitizeSavedState,
+      recommendedConfigForPlayerCount,
+      setupRiskProfile,
+      dashboardSummary,
+      discussionPrompt,
+      stepCanAdvance
     };
 
     if (restoreState() && wantsWakeLock) acquireWakeLock();
     createStars();
-    scheduleRender(true);
+    resetScrollNext = true;
+    render();
+    queuePersist();
   </script>
 </body>
 </html>
