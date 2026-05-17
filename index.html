@@ -24,6 +24,7 @@
       --green: #1A6040;
       --green-hot: #22B060;
       --blue: #6888D0;
+      --cyan: #71D3F5;
       --text: #E2D6C0;
       --text-2: #887868;
       --text-3: #4A4038;
@@ -50,6 +51,11 @@
     button, input { font: inherit; }
     button { border: 0; color: inherit; cursor: pointer; }
     button:disabled { cursor: not-allowed; opacity: .42; }
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid rgba(212,170,20,.72);
+      outline-offset: 3px;
+    }
 
     .ambient {
       position: fixed;
@@ -128,6 +134,7 @@
       transition: opacity .22s var(--steady), transform .22s var(--steady);
       contain: layout style;
     }
+    body.has-toast #app { padding-bottom: calc(var(--safe-bottom) + 172px); }
     #app.is-moving { opacity: 0; transform: translate3d(0, 18px, 0); }
 
     .screen {
@@ -192,6 +199,7 @@
     }
 
     .panel { border-radius: 24px; padding: 16px; margin-bottom: 14px; }
+    .panel-tight { padding: 12px; }
     .section-label {
       display: flex;
       align-items: center;
@@ -206,6 +214,27 @@
     .section-label svg { width: 15px; height: 15px; }
     .muted { color: var(--text-2); }
     .tiny { color: var(--text-3); font-size: .75rem; }
+    .stack { display: grid; gap: 10px; }
+
+    .setup-topline {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .setup-count {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--text);
+      font-weight: 800;
+      font-size: .76rem;
+    }
 
     .input-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
     .name-input {
@@ -263,6 +292,24 @@
     .btn-block { width: 100%; }
     .btn-icon { width: 46px; padding: 0; }
 
+    .notice {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 42px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      margin-top: 12px;
+      font-size: .82rem;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+    }
+    .notice svg { width: 17px; height: 17px; flex: 0 0 auto; }
+    .notice.ok { color: #A8E8BF; border-color: rgba(34,176,96,.25); }
+    .notice.warn { color: #F2D779; border-color: rgba(212,170,20,.24); }
+    .notice.err { color: #FF9AAB; border-color: rgba(216,20,54,.28); }
+
     .player-list { display: grid; gap: 9px; }
     .person-row {
       min-height: 58px;
@@ -301,6 +348,28 @@
     .skeleton { height: 58px; border-radius: 18px; background: linear-gradient(90deg, rgba(255,255,255,.035), rgba(255,255,255,.07), rgba(255,255,255,.035)); opacity: .55; }
 
     .config-list { display: grid; gap: 10px; }
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .preset-card {
+      min-height: 92px;
+      border-radius: 18px;
+      padding: 11px;
+      text-align: left;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.07);
+      transition: transform .18s var(--spring), background .18s var(--steady), border-color .18s var(--steady);
+    }
+    .preset-card:active { transform: scale(.975); }
+    .preset-card.active {
+      background: rgba(212,170,20,.12);
+      border-color: rgba(212,170,20,.42);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 12px 30px rgba(184,146,12,.14);
+    }
+    .preset-name { font-weight: 900; font-size: .86rem; }
+    .preset-sub { margin-top: 6px; color: var(--text-2); font-size: .72rem; line-height: 1.25; }
     .config-row {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -314,6 +383,32 @@
     }
     .config-name { font-weight: 700; }
     .config-meta { margin-top: 3px; color: var(--text-2); font-size: .76rem; }
+    .deck-preview {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 2px 8px;
+      margin-top: 12px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .deck-preview::-webkit-scrollbar { display: none; }
+    .role-mini {
+      min-width: 92px;
+      border-radius: 16px;
+      padding: 10px;
+      background: rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+    .role-mini-value {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      color: var(--gold-hot);
+      font-weight: 800;
+      font-size: 1.25rem;
+      line-height: .9;
+    }
+    .role-mini-name { margin-top: 6px; font-weight: 800; font-size: .76rem; }
+    .role-mini-count { margin-top: 3px; color: var(--text-2); font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; }
     .stepper { display: grid; grid-template-columns: 38px 34px 38px; align-items: center; gap: 4px; }
     .stepper button {
       height: 38px;
@@ -462,6 +557,13 @@
       margin: 0 auto;
       perspective: 1300px;
       contain: layout paint style;
+      animation: cardDeal .66s var(--spring) both;
+      animation-delay: min(calc(var(--deal-index, 0) * 26ms), 260ms);
+    }
+    @keyframes cardDeal {
+      0% { opacity: 0; transform: translate3d(0, 42dvh, 0) rotate(-9deg) scale(.72); }
+      68% { opacity: 1; transform: translate3d(0, -8px, 0) rotate(2deg) scale(1.025); }
+      100% { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
     }
     .playing-card {
       position: relative;
@@ -473,7 +575,26 @@
       will-change: transform;
       transform: translateZ(0);
     }
-    .playing-card.flipped { transform: rotateY(180deg) translateZ(0); }
+    .playing-card.flipped {
+      transform: rotateY(180deg) translateZ(0);
+      animation: flipIn .72s var(--spring) both;
+    }
+    @keyframes flipIn {
+      from { transform: rotateY(0deg) translateZ(0) scale(.985); }
+      to { transform: rotateY(180deg) translateZ(0) scale(1); }
+    }
+    .playing-card.flipped .card-front::after {
+      content: "";
+      position: absolute;
+      inset: -22%;
+      background: linear-gradient(115deg, transparent 22%, rgba(255,255,255,.36) 45%, transparent 62%);
+      transform: translateX(-70%) rotate(8deg);
+      animation: cardShine .82s .12s var(--steady) both;
+      pointer-events: none;
+    }
+    @keyframes cardShine {
+      to { transform: translateX(70%) rotate(8deg); opacity: 0; }
+    }
     .card-face {
       position: absolute;
       inset: 0;
@@ -539,6 +660,13 @@
     .card-value { font-family: "Cormorant Garamond", Georgia, serif; font-size: 5.1rem; font-weight: 700; line-height: .72; }
     .card-suit { margin-top: 10px; font-family: "Cormorant Garamond", Georgia, serif; font-size: 2.2rem; line-height: 1; color: currentColor; }
     .card-role { margin-top: 16px; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .16em; color: currentColor; opacity: .78; }
+    .card-description {
+      margin-top: 10px;
+      font-size: .74rem;
+      line-height: 1.24;
+      font-weight: 700;
+      opacity: .72;
+    }
     .red-pip { color: #A81124; }
     .black-pip { color: currentColor; }
     .gold-pip { color: var(--gold-hot); }
@@ -560,9 +688,11 @@
       border: 1px solid rgba(0,0,0,.12);
     }
     .role-pip.mafia { background: linear-gradient(155deg, #291016, #0D0A12); color: #F0E7D4; border-color: rgba(216,20,54,.32); }
+    .role-pip svg { width: 20px; height: 20px; }
     .pip-suit { display: block; margin-top: 4px; font-size: 1.05rem; }
 
     .game-row {
+      width: 100%;
       min-height: 70px;
       display: grid;
       grid-template-columns: auto 1fr auto;
@@ -613,6 +743,66 @@
     }
     .dot.done, .dot.active { background: rgba(212,170,20,.38); }
     .dot.active { box-shadow: 0 0 18px rgba(212,170,20,.38); }
+
+    .vote-card {
+      border-radius: 28px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .vote-kicker {
+      color: var(--text-2);
+      font-size: .75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+    .vote-name {
+      margin-top: 7px;
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 2.25rem;
+      font-weight: 700;
+      line-height: 1;
+      overflow-wrap: anywhere;
+    }
+    .vote-copy { margin-top: 8px; color: var(--text-2); line-height: 1.4; }
+    .tally-list { display: grid; gap: 9px; margin-top: 12px; }
+    .tally-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 48px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+    .tally-row.winner { border-color: rgba(212,170,20,.38); background: rgba(212,170,20,.11); }
+    .tally-name { font-weight: 800; overflow-wrap: anywhere; }
+    .tally-count {
+      min-width: 34px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: #181008;
+      background: linear-gradient(180deg, #F1C640, #B8920C);
+      font-weight: 900;
+    }
+    .result-banner {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 13px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.045);
+    }
+    .result-banner svg { width: 24px; height: 24px; color: var(--gold-hot); }
+    .result-title { font-weight: 900; }
+    .result-sub { margin-top: 3px; color: var(--text-2); font-size: .82rem; line-height: 1.3; }
 
     .step-card {
       position: relative;
@@ -731,6 +921,11 @@
       background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.02));
       border: 1px solid rgba(255,255,255,.12);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 24px 70px rgba(0,0,0,.48);
+      animation: winnerIn .6s var(--spring) both;
+    }
+    @keyframes winnerIn {
+      from { opacity: 0; transform: translate3d(0, 20px, 0) scale(.78) rotate(-6deg); }
+      to { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
     }
     .winner-mark svg { width: 38px; height: 38px; }
     .winner-title {
@@ -859,6 +1054,8 @@
       .player-name { font-size: 1.22rem; }
       .btn { padding: 0 12px; font-size: .8rem; }
       .card-value { font-size: 4.4rem; }
+      .preset-grid { grid-template-columns: 1fr; }
+      .preset-card { min-height: 74px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -873,27 +1070,37 @@
 <body>
   <div class="ambient" aria-hidden="true"></div>
   <div id="stars" aria-hidden="true"></div>
-  <main id="app"></main>
+  <main id="app" aria-live="polite"></main>
   <div id="modal-root"></div>
   <div id="toast-root"></div>
 
   <script>
     "use strict";
 
+    const STORAGE_KEY = "mafia_party_game_v2";
+    const SAVE_VERSION = 2;
+    const DEFAULT_CONFIG = { killers: 1, torturers: 0, doctors: 1, detectives: 1, whore: false, joker: false };
+
     const ROLE = {
-      killer: { label: "Killer", value: "K", suit: "♠", team: "mafia", color: "black", night: "Kill one player." },
-      torturer: { label: "Torturer", value: "T", suit: "♣", team: "mafia", color: "black", night: "Silence or restrain one player." },
-      detective: { label: "Detective", value: "J", suit: "♦", team: "town", color: "red", night: "Investigate one suspect." },
-      doctor: { label: "Doctor", value: "10", suit: "♥", team: "town", color: "red", night: "Save one player." },
-      whore: { label: "Whore", value: "Q", suit: "♥", team: "neutral", color: "red", night: "Sleep with one player." },
-      joker: { label: "Joker", value: "★", suit: "★", team: "neutral", color: "gold", night: "Suggest a kill target." },
-      civilian: { label: "Civilian", value: "2", suit: "♠", team: "town", color: "black", night: "No night action." }
+      killer: { label: "Killer", value: "K", suit: "♠", team: "mafia", color: "black", night: "Wake with Mafia and choose one victim.", description: "Win when Mafia equals or outnumbers Town." },
+      torturer: { label: "Torturer", value: "T", suit: "♣", team: "mafia", color: "black", night: "Silence speech or block one vote.", description: "Becomes a Killer after the last Killer dies." },
+      detective: { label: "Detective", value: "J", suit: "♦", team: "town", color: "red", night: "Investigate whether one suspect is Mafia.", description: "Receives a private thumbs result from the narrator." },
+      doctor: { label: "Doctor", value: "10", suit: "♥", team: "town", color: "red", night: "Protect one player from the Mafia kill.", description: "Cannot self-save in the first round." },
+      whore: { label: "Whore", value: "Q", suit: "♥", team: "neutral", color: "red", night: "Choose one player to share the night with.", description: "Can block a Killer, but may share a victim's fate." },
+      joker: { label: "Joker", value: "★", suit: "★", team: "neutral", color: "gold", night: "Optionally suggest a target to Mafia.", description: "Adds misdirection without changing win conditions." },
+      civilian: { label: "Civilian", value: "2", suit: "♠", team: "town", color: "black", night: "Sleep through the night.", description: "Read people, vote carefully, and help Town survive." }
     };
 
     const TEAM_ORDER = [
       { id: "mafia", label: "Mafia", roles: ["killer", "torturer"] },
       { id: "town", label: "Town", roles: ["civilian", "detective", "doctor"] },
       { id: "neutral", label: "Neutral", roles: ["whore", "joker"] }
+    ];
+
+    const PRESETS = [
+      { id: "beginner", label: "Beginner", sub: "One Killer, simple reads, fastest teach.", config: { killers: 1, torturers: 0, doctors: 0, detectives: 0, whore: false, joker: false } },
+      { id: "classic", label: "Classic", sub: "Killer, Doctor, Detective, civilians.", config: DEFAULT_CONFIG },
+      { id: "advanced", label: "Advanced", sub: "Adds Torturer, Whore, and Joker chaos.", config: { killers: 1, torturers: 1, doctors: 1, detectives: 1, whore: true, joker: true } }
     ];
 
     const STEP_META = {
@@ -937,19 +1144,23 @@
       screen: "setup",
       phase: "setup",
       players: [],
-      config: { killers: 1, torturers: 0, doctors: 0, detectives: 0, whore: false, joker: false },
+      config: { ...DEFAULT_CONFIG },
+      preset: "classic",
+      setupNotice: null,
       currentName: "",
       revealIndex: 0,
       cardFlipped: false,
       round: 1,
       torturerPromoted: false,
       night: { steps: [], index: 0, actions: emptyActions() },
+      vote: null,
       events: [],
       history: [],
       result: null,
       modal: null,
       narratorTab: "roles",
       undo: null,
+      restoredAt: null,
       transitionKey: "setup"
     };
 
@@ -961,6 +1172,7 @@
     let wantsWakeLock = false;
     let dragSheet = null;
     let dragRaf = 0;
+    let persistQueued = false;
 
     const app = document.getElementById("app");
     const modalRoot = document.getElementById("modal-root");
@@ -1015,25 +1227,67 @@
         .map((p) => p.id);
     }
 
+    function normalizeName(value) {
+      return String(value == null ? "" : value).trim().replace(/\s+/g, " ");
+    }
+
+    function canonicalName(value) {
+      return normalizeName(value).toLocaleLowerCase();
+    }
+
+    function hasDuplicateNames(players = state.players) {
+      const seen = new Set();
+      return players.some((player) => {
+        const key = canonicalName(player.name);
+        if (!key) return false;
+        if (seen.has(key)) return true;
+        seen.add(key);
+        return false;
+      });
+    }
+
+    function configMatches(a, b) {
+      return ["killers", "torturers", "doctors", "detectives", "whore", "joker"].every((key) => a[key] === b[key]);
+    }
+
+    function selectedPresetId(config = state.config) {
+      const preset = PRESETS.find((item) => configMatches(config, item.config));
+      return preset ? preset.id : "custom";
+    }
+
     function totalAssignedRoles(config = state.config) {
       return config.killers + config.torturers + config.doctors + config.detectives + (config.whore ? 1 : 0) + (config.joker ? 1 : 0);
     }
 
-    function civilianCount() {
-      return Math.max(0, state.players.length - totalAssignedRoles());
+    function civilianCount(config = state.config, players = state.players) {
+      return Math.max(0, players.length - totalAssignedRoles(config));
     }
 
-    function validation() {
-      const total = totalAssignedRoles();
-      const townSlots = civilianCount() + state.config.doctors + state.config.detectives;
-      const mafiaSlots = state.config.killers + state.config.torturers;
-      if (state.players.length === 0) return { level: "warn", text: "Add at least 3 players to deal." };
-      if (state.players.length < 3) return { level: "err", text: `Need at least 3 players. You have ${state.players.length}.` };
-      if (state.config.killers < 1) return { level: "err", text: "At least one Killer is required." };
-      if (total > state.players.length) return { level: "err", text: `${total} roles selected for ${state.players.length} players.` };
+    function deckCounts(config = state.config, players = state.players) {
+      return [
+        ["killer", config.killers],
+        ["torturer", config.torturers],
+        ["doctor", config.doctors],
+        ["detective", config.detectives],
+        ["whore", config.whore ? 1 : 0],
+        ["joker", config.joker ? 1 : 0],
+        ["civilian", civilianCount(config, players)]
+      ].filter(([, count]) => count > 0);
+    }
+
+    function validation(config = state.config, players = state.players) {
+      const total = totalAssignedRoles(config);
+      const townSlots = civilianCount(config, players) + config.doctors + config.detectives;
+      const mafiaSlots = config.killers + config.torturers;
+      if (players.length === 0) return { level: "warn", text: "Add at least 3 players to deal." };
+      if (players.length < 3) return { level: "err", text: `Need at least 3 players. You have ${players.length}.` };
+      if (players.length > 24) return { level: "err", text: "Keep the table to 24 players or fewer." };
+      if (hasDuplicateNames(players)) return { level: "err", text: "Player names must be unique." };
+      if (config.killers < 1) return { level: "err", text: "At least one Killer is required." };
+      if (total > players.length) return { level: "err", text: `${total} roles selected for ${players.length} players.` };
       if (townSlots < 1) return { level: "err", text: "Add at least one Town player or leave room for a Civilian." };
       if (mafiaSlots >= townSlots) return { level: "err", text: "Town must outnumber Mafia when cards are dealt." };
-      return { level: "ok", text: `Ready. ${civilianCount()} Civilian${civilianCount() === 1 ? "" : "s"} will fill the deck.` };
+      return { level: "ok", text: `Ready. ${civilianCount(config, players)} Civilian${civilianCount(config, players) === 1 ? "" : "s"} will fill the deck.` };
     }
 
     function isValidSetup() {
@@ -1042,6 +1296,7 @@
 
     function scheduleRender(resetScroll) {
       if (resetScroll) resetScrollNext = true;
+      queuePersist();
       if (renderQueued) return;
       renderQueued = true;
       requestAnimationFrame(render);
@@ -1066,6 +1321,7 @@
     function render() {
       renderQueued = false;
       document.body.classList.toggle("night", state.phase === "night" || state.phase === "dawn" || state.screen === "reveal");
+      document.body.classList.toggle("has-toast", Boolean(state.undo));
       app.innerHTML = renderScreen();
       modalRoot.innerHTML = renderModal();
       toastRoot.innerHTML = renderToast();
@@ -1081,6 +1337,7 @@
       if (state.screen === "gameover") return renderGameOver();
       if (state.phase === "night") return renderNight();
       if (state.phase === "dawn") return renderDawn();
+      if (state.phase === "vote") return renderVote();
       return renderDay();
     }
 
@@ -1089,6 +1346,7 @@
       const players = state.players.length
         ? `<div class="player-list">${state.players.map((p, i) => renderSetupPlayer(p, i)).join("")}</div>`
         : `<div class="player-list">${[0,1,2].map(() => '<div class="skeleton"></div>').join("")}</div>`;
+      const presetId = selectedPresetId();
       return `
         <section class="screen">
           <div class="logo-wrap">
@@ -1097,13 +1355,23 @@
             <div class="kicker">One phone. Closed eyes. Bad alibis.</div>
           </div>
           <div class="panel glass">
-            <div class="section-label">${icon("users")} Players</div>
+            <div class="setup-topline">
+              <div class="section-label" style="margin:0">${icon("users")} Players</div>
+              <div class="setup-count">${state.players.length}/24 seated</div>
+            </div>
             <div class="input-row">
               <input class="name-input" id="player-name-field" value="${esc(state.currentName)}" maxlength="22" autocomplete="off" autocorrect="off" autocapitalize="words" placeholder="Player name">
               <button class="btn btn-gold" data-action="add-player">${icon("plus")} Add</button>
             </div>
+            ${renderSetupNotice()}
             <div style="height:12px"></div>
             ${players}
+          </div>
+          <div class="panel glass">
+            <div class="section-label">${icon("cards")} Preset</div>
+            <div class="preset-grid">
+              ${PRESETS.map((preset) => renderPreset(preset, presetId)).join("")}
+            </div>
           </div>
           <div class="panel glass">
             <div class="section-label">${icon("cards")} Roles</div>
@@ -1115,10 +1383,35 @@
               ${renderToggle("whore", "Whore", "Neutral")}
               ${renderToggle("joker", "Joker", "Neutral")}
             </div>
+            ${renderDeckPreview()}
           </div>
-          <div class="validation ${v.level}">${icon(v.level === "ok" ? "check" : "info")} <span>${esc(v.text)}</span></div>
+          <div class="validation ${v.level}" aria-live="polite">${icon(v.level === "ok" ? "check" : "info")} <span>${esc(v.text)}</span></div>
           <button class="btn btn-primary btn-block" data-action="start-game" ${isValidSetup() ? "" : "disabled"}>${icon("cards")} Deal Cards &rarr;</button>
         </section>`;
+    }
+
+    function renderSetupNotice() {
+      if (!state.setupNotice) return "";
+      return `<div class="notice ${state.setupNotice.level || "warn"}" aria-live="polite">${icon(state.setupNotice.level === "ok" ? "check" : "info")}<span>${esc(state.setupNotice.text)}</span></div>`;
+    }
+
+    function renderPreset(preset, activeId) {
+      return `
+        <button class="preset-card ${preset.id === activeId ? "active" : ""}" data-action="apply-preset" data-preset="${preset.id}" aria-pressed="${preset.id === activeId}">
+          <div class="preset-name">${esc(preset.label)}</div>
+          <div class="preset-sub">${esc(preset.sub)}</div>
+        </button>`;
+    }
+
+    function renderDeckPreview() {
+      const counts = deckCounts();
+      return `
+        <div class="deck-preview" aria-label="Current deck preview">
+          ${counts.map(([roleId, count]) => {
+            const role = ROLE[roleId];
+            return `<div class="role-mini"><div class="role-mini-value">${role.value}${role.suit}</div><div class="role-mini-name">${role.label}</div><div class="role-mini-count">${count} card${count === 1 ? "" : "s"}</div></div>`;
+          }).join("")}
+        </div>`;
     }
 
     function renderSetupPlayer(player, index) {
@@ -1132,11 +1425,13 @@
 
     function renderStepper(key, label, team, min, max) {
       const value = state.config[key];
+      const roleId = key === "killers" ? "killer" : key === "torturers" ? "torturer" : key === "doctors" ? "doctor" : "detective";
+      const role = ROLE[roleId];
       return `
         <div class="config-row">
           <div>
             <div class="config-name">${label}</div>
-            <div class="config-meta">${team} - ${min} to ${max}</div>
+            <div class="config-meta">${team} - ${role.night}</div>
           </div>
           <div class="stepper">
             <button data-action="config-step" data-key="${key}" data-delta="-1" ${value <= min ? "disabled" : ""} aria-label="Decrease ${label}">${icon("minus")}</button>
@@ -1148,11 +1443,12 @@
 
     function renderToggle(key, label, team) {
       const on = state.config[key];
+      const role = ROLE[key];
       return `
         <button class="config-row" data-action="config-toggle" data-key="${key}" aria-pressed="${on}">
           <div style="text-align:left">
             <div class="config-name">${label}</div>
-            <div class="config-meta">${team} - optional role</div>
+            <div class="config-meta">${team} - ${role.night}</div>
           </div>
           <span class="toggle ${on ? "on" : ""}"><span></span></span>
         </button>`;
@@ -1170,26 +1466,26 @@
             <div class="reveal-count">${state.revealIndex + 1} of ${state.players.length}</div>
             <div class="reveal-name">${esc(player.name)}</div>
           </div>
-          <button class="card-scene" data-action="flip-card" aria-label="Reveal card for ${esc(player.name)}">
+          <button class="card-scene" style="--deal-index:${state.revealIndex}" data-action="flip-card" aria-label="Reveal card for ${esc(player.name)}">
             <div class="playing-card ${state.cardFlipped ? "flipped" : ""}">
               <div class="card-face card-back">
                 <div class="card-back-mark">MAFIA</div>
               </div>
-              ${renderPlayingCard(role)}
+              ${state.cardFlipped ? renderPlayingCard(role, true) : renderHiddenCardFront()}
             </div>
           </button>
           <div>
-            <div class="reveal-hint">${state.cardFlipped ? `Memorize the role, then pass the phone face-down.` : `Only ${esc(player.name)} should look at this screen.`}</div>
+            <div class="reveal-hint">${state.cardFlipped ? `Memorize the role, then pass the phone face-down.` : `Only ${esc(player.name)} should look. Tap the card when ready.`}</div>
             ${state.cardFlipped ? `<div style="height:12px"></div><button class="btn btn-primary btn-block" data-action="next-reveal">${last ? "Hand to Narrator" : `Pass to ${esc(nextName)}`} &rarr;</button>` : ""}
           </div>
         </section>`;
     }
 
-    function renderPlayingCard(role) {
+    function renderPlayingCard(role, revealed = true) {
       const teamClass = role.team === "mafia" ? "mafia" : role.team === "neutral" ? "neutral" : "";
       const pipClass = role.color === "red" ? "red-pip" : role.color === "gold" ? "gold-pip" : "black-pip";
       return `
-        <div class="card-face card-front ${teamClass}">
+        <div class="card-face card-front ${teamClass}" aria-hidden="${revealed ? "false" : "true"}">
           <div class="card-corner ${pipClass}">${role.value}<br>${role.suit}</div>
           <div class="card-corner br ${pipClass}">${role.value}<br>${role.suit}</div>
           <div class="card-center">
@@ -1197,9 +1493,14 @@
               <div class="card-value">${role.value}</div>
               <div class="card-suit ${pipClass}">${role.suit}</div>
               <div class="card-role">${role.label}</div>
+              <div class="card-description">${esc(role.description)}</div>
             </div>
           </div>
         </div>`;
+    }
+
+    function renderHiddenCardFront() {
+      return `<div class="card-face card-front" aria-hidden="true"></div>`;
     }
 
     function renderHeader(phaseLabel, iconName, sub) {
@@ -1213,6 +1514,7 @@
             <div class="phase-pill">${icon(iconName)} ${phaseLabel}</div>
           </div>
           ${state.phase === "night" ? `<div class="progress-dots">${state.night.steps.map((_, i) => `<span class="dot ${i < state.night.index ? "done" : i === state.night.index ? "active" : ""}"></span>`).join("")}</div>` : ""}
+          ${state.phase === "vote" && state.vote && state.vote.voters.length ? `<div class="progress-dots">${state.vote.voters.map((_, i) => `<span class="dot ${i < state.vote.index ? "done" : i === state.vote.index ? "active" : ""}"></span>`).join("")}</div>` : ""}
         </header>`;
     }
 
@@ -1221,38 +1523,123 @@
       const dead = state.players.filter((p) => !p.alive);
       return `
         <section class="screen">
-          ${renderHeader("Day", "sun", `${live.length} alive - tap a player to eliminate`)}
+          ${renderHeader("Day", "sun", `${live.length} alive - discuss, accuse, then vote`)}
+          <div class="vote-card glass">
+            <div class="vote-kicker">Discussion</div>
+            <div class="vote-name">Find the lie</div>
+            <div class="vote-copy">Let the table talk. When accusations settle, start a structured phone vote or go straight to night with no elimination.</div>
+          </div>
           <div class="panel glass">
             <div class="section-label">${icon("users")} Alive</div>
-            ${live.map((p, i) => renderPlayerRow(p, { index: i, action: "open-eliminate" })).join("")}
+            ${live.map((p, i) => renderPlayerRow(p, { index: i, hideRole: true })).join("")}
             ${dead.length ? `<div class="boneyard"><div class="section-label">${icon("skull")} Boneyard</div>${dead.map((p, i) => renderPlayerRow(p, { index: i, dead: true })).join("")}</div>` : ""}
           </div>
           ${renderFab()}
           <div class="bottom-actions">
             <div class="bottom-inner">
-              <button class="btn btn-ghost" data-action="skip-vote">Skip Vote</button>
-              <button class="btn btn-primary" data-action="start-night">${icon("moon")} Begin Night</button>
+              <button class="btn btn-ghost" data-action="skip-vote">No Elimination</button>
+              <button class="btn btn-primary" data-action="start-vote">${icon("users")} Start Vote</button>
             </div>
           </div>
         </section>`;
     }
 
+    function renderVote() {
+      const vote = state.vote || createVoteState();
+      const current = currentVoter(vote);
+      const summary = voteSummary(vote);
+      if (!current) return renderVoteResult(summary);
+      const candidates = alive();
+      return `
+        <section class="screen">
+          ${renderHeader("Vote", "users", `Ballot ${vote.index + 1} of ${vote.voters.length}`)}
+          <div class="vote-card glass">
+            <div class="vote-kicker">Current voter</div>
+            <div class="vote-name">${esc(current.name)}</div>
+            <div class="vote-copy">Pass the phone to ${esc(current.name)}. They choose one player to eliminate, or abstain.</div>
+          </div>
+          <div class="panel glass">
+            <div class="section-label">${icon("skull")} Vote for elimination</div>
+            ${candidates.map((p, i) => renderPlayerRow(p, { index: i, action: "cast-vote", hideRole: true })).join("")}
+            <button class="game-row glass-lite" style="--i:${candidates.length}" data-action="cast-vote" data-id="">
+              <div class="role-pip">${icon("x")}</div>
+              <div style="text-align:left; min-width:0">
+                <div class="player-name">Abstain</div>
+                <div class="row-sub"><span>No vote from this player</span></div>
+              </div>
+            </button>
+          </div>
+          ${renderFab()}
+          <div class="bottom-actions">
+            <div class="bottom-inner single">
+              <button class="btn btn-ghost" data-action="cancel-vote">Back to Discussion</button>
+            </div>
+          </div>
+        </section>`;
+    }
+
+    function renderVoteResult(summary) {
+      const winner = summary.winnerId ? byId(summary.winnerId) : null;
+      const title = winner ? `${winner.name} has the table` : summary.tie ? "Vote tied" : "No elimination";
+      const sub = winner
+        ? `${winner.name} received ${summary.highest} vote${summary.highest === 1 ? "" : "s"}. Confirm before revealing the boneyard.`
+        : summary.tie
+          ? "The highest vote is tied. The table can revote or go to night."
+          : "No valid votes were cast. Continue to night or restart the vote.";
+      return `
+        <section class="screen">
+          ${renderHeader("Vote", "users", "Table result")}
+          <div class="result-banner glass">
+            ${icon(winner ? "skull" : "info")}
+            <div>
+              <div class="result-title">${esc(title)}</div>
+              <div class="result-sub">${esc(sub)}</div>
+            </div>
+          </div>
+          <div class="panel glass">
+            <div class="section-label">${icon("log")} Tally</div>
+            <div class="tally-list">
+              ${summary.rows.length ? summary.rows.map((row) => renderTallyRow(row, summary.winnerId)).join("") : `<div class="event-row glass-lite info">${icon("info")}<div><div class="event-title">No votes</div><div class="event-msg">Everyone abstained or no one could vote.</div></div></div>`}
+            </div>
+          </div>
+          ${renderFab()}
+          <div class="bottom-actions">
+            <div class="bottom-inner">
+              <button class="btn btn-ghost" data-action="restart-vote">Revote</button>
+              ${winner ? `<button class="btn btn-danger" data-action="open-eliminate" data-id="${winner.id}">${icon("skull")} Confirm</button>` : `<button class="btn btn-primary" data-action="skip-vote">${icon("moon")} Begin Night</button>`}
+            </div>
+          </div>
+        </section>`;
+    }
+
+    function renderTallyRow(row, winnerId) {
+      return `
+        <div class="tally-row ${row.id === winnerId ? "winner" : ""}">
+          <div>
+            <div class="tally-name">${esc(row.name)}</div>
+            <div class="tiny">${row.voters.map(esc).join(", ") || "No voters"}</div>
+          </div>
+          <div class="tally-count">${row.count}</div>
+        </div>`;
+    }
+
     function renderPlayerRow(player, opts = {}) {
+      const revealRole = !opts.hideRole || !player.alive;
       const role = ROLE[player.role || "civilian"];
       const badges = [];
       if (!player.canTalk) badges.push(`<span class="badge gold">${icon("mouth")} Muted</span>`);
       if (!player.canVote) badges.push(`<span class="badge gold">${icon("hand")} No vote</span>`);
-      if (player.promoted) badges.push(`<span class="badge red">${icon("crown")} Killer</span>`);
+      if (player.promoted && revealRole) badges.push(`<span class="badge red">${icon("crown")} Killer</span>`);
       if (!player.alive) badges.push(`<span class="badge">${icon("skull")} Dead</span>`);
       const selected = opts.selected ? "selected" : "";
       const dead = opts.dead || !player.alive ? "dead" : "";
       const action = opts.action ? `data-action="${opts.action}" data-id="${player.id}"` : "";
       return `
         <button class="game-row glass-lite ${selected} ${dead}" style="--i:${opts.index || 0}" ${action}>
-          ${renderRolePip(role)}
+          ${revealRole ? renderRolePip(role) : renderHiddenRolePip()}
           <div style="text-align:left; min-width:0">
             <div class="player-name">${esc(player.name)}</div>
-            <div class="row-sub"><span>${role.label}</span>${badges.join("")}</div>
+            <div class="row-sub"><span>${revealRole ? role.label : "Role hidden"}</span>${badges.join("")}</div>
           </div>
           ${opts.selected ? `<div class="row-check">${icon("check")}</div>` : ""}
         </button>`;
@@ -1262,6 +1649,10 @@
       const team = role.team === "mafia" ? "mafia" : "";
       const color = role.color === "red" ? "red-pip" : role.color === "gold" ? "gold-pip" : "";
       return `<div class="role-pip ${team} ${color}"><span>${role.value}</span><span class="pip-suit">${role.suit}</span></div>`;
+    }
+
+    function renderHiddenRolePip() {
+      return `<div class="role-pip"><span>?</span><span class="pip-suit">♠</span></div>`;
     }
 
     function renderFab() {
@@ -1447,6 +1838,7 @@
       if (!state.modal) return "";
       if (state.modal.type === "eliminate") return renderEliminateModal();
       if (state.modal.type === "narrator") return renderNarratorModal();
+      if (state.modal.type === "reset") return renderResetModal();
       return "";
     }
 
@@ -1455,7 +1847,7 @@
       if (!player) return "";
       return `
         <div class="overlay" data-action="modal-backdrop">
-          <div class="sheet glass" data-sheet>
+          <div class="sheet glass" data-sheet role="dialog" aria-modal="true" aria-label="Confirm elimination">
             <div class="sheet-handle"></div>
             <div class="sheet-title">Eliminate ${esc(player.name)}?</div>
             <p class="muted">Their role will be visible in the boneyard. You will have five seconds to undo.</p>
@@ -1467,12 +1859,27 @@
         </div>`;
     }
 
+    function renderResetModal() {
+      return `
+        <div class="overlay" data-action="modal-backdrop">
+          <div class="sheet glass" data-sheet role="dialog" aria-modal="true" aria-label="Start a new game">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">Start a new game?</div>
+            <p class="muted">The current round, votes, night log, and revealed roles will reset. Player names and role settings stay ready for another deal.</p>
+            <div class="modal-actions">
+              <button class="btn btn-ghost" data-action="close-modal">Cancel</button>
+              <button class="btn btn-danger" data-action="confirm-reset">${icon("cards")} Reset</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
     function renderNarratorModal() {
       const counts = liveCounts();
       const body = state.narratorTab === "roles" ? renderNarratorRoles() : renderNightLog();
       return `
         <div class="overlay" data-action="modal-backdrop">
-          <div class="sheet glass" data-sheet>
+          <div class="sheet glass" data-sheet role="dialog" aria-modal="true" aria-label="Narrator panel">
             <div class="sheet-handle"></div>
             <div class="sheet-title">Narrator Panel</div>
             <div class="count-grid">
@@ -1536,10 +1943,27 @@
 
     function addPlayer() {
       const field = document.getElementById("player-name-field");
-      const name = (field ? field.value : state.currentName).trim();
-      if (!name) return;
+      const name = normalizeName(field ? field.value : state.currentName);
+      if (!name) {
+        state.setupNotice = { level: "warn", text: "Type a player name first." };
+        scheduleRender();
+        return;
+      }
+      if (state.players.length >= 24) {
+        state.setupNotice = { level: "err", text: "This table is full. Keep games to 24 players or fewer." };
+        pulse("tap");
+        scheduleRender();
+        return;
+      }
+      if (state.players.some((player) => canonicalName(player.name) === canonicalName(name))) {
+        state.setupNotice = { level: "err", text: `${name} is already seated.` };
+        pulse("tap");
+        scheduleRender();
+        return;
+      }
       state.players.push({ id: uid(), name, role: null, alive: true, canTalk: true, canVote: true, promoted: false });
       state.currentName = "";
+      state.setupNotice = { level: "ok", text: `${name} joined the table.` };
       pulse("tap");
       scheduleRender();
       requestAnimationFrame(() => {
@@ -1552,6 +1976,18 @@
       const limits = { killers: [1, 10], torturers: [0, 8], doctors: [0, 6], detectives: [0, 6] };
       const [min, max] = limits[key] || [0, 10];
       state.config[key] = Math.max(min, Math.min(max, state.config[key] + delta));
+      state.preset = selectedPresetId();
+      state.setupNotice = null;
+      pulse("tap");
+      scheduleRender();
+    }
+
+    function applyPreset(id) {
+      const preset = PRESETS.find((item) => item.id === id);
+      if (!preset) return;
+      state.config = { ...preset.config };
+      state.preset = preset.id;
+      state.setupNotice = { level: "ok", text: `${preset.label} preset applied.` };
       pulse("tap");
       scheduleRender();
     }
@@ -1581,7 +2017,10 @@
       state.torturerPromoted = false;
       state.events = [];
       state.history = [];
+      state.vote = null;
       state.result = null;
+      state.modal = null;
+      state.setupNotice = null;
       wantsWakeLock = true;
       acquireWakeLock();
       pulse("tap");
@@ -1622,8 +2061,75 @@
       }
     }
 
+    function createVoteState() {
+      return {
+        voters: alive().filter((p) => p.canVote).map((p) => p.id),
+        index: 0,
+        ballots: {}
+      };
+    }
+
+    function startVote() {
+      clearUndo();
+      state.vote = createVoteState();
+      pulse("tap");
+      navigate("game", "vote");
+    }
+
+    function cancelVote() {
+      state.vote = null;
+      pulse("tap");
+      navigate("game", "day");
+    }
+
+    function currentVoter(vote = state.vote) {
+      if (!vote || vote.index >= vote.voters.length) return null;
+      const voter = byId(vote.voters[vote.index]);
+      return voter && voter.alive && voter.canVote ? voter : null;
+    }
+
+    function castVote(targetId) {
+      const vote = state.vote;
+      if (!vote || vote.index >= vote.voters.length) return;
+      const voterId = vote.voters[vote.index];
+      const target = targetId ? byId(targetId) : null;
+      vote.ballots[voterId] = target && target.alive ? target.id : null;
+      vote.index += 1;
+      pulse(target ? "tap" : "flip");
+      scheduleRender(true);
+    }
+
+    function voteSummary(vote = state.vote, players = state.players) {
+      const rowsById = new Map();
+      const voters = vote ? vote.voters.map((id) => byId(id, players)).filter(Boolean) : [];
+      if (vote) {
+        Object.entries(vote.ballots).forEach(([voterId, targetId]) => {
+          if (!targetId) return;
+          const voter = byId(voterId, players);
+          const target = byId(targetId, players);
+          if (!voter || !target || !target.alive) return;
+          if (!rowsById.has(target.id)) rowsById.set(target.id, { id: target.id, name: target.name, count: 0, voters: [] });
+          const row = rowsById.get(target.id);
+          row.count += 1;
+          row.voters.push(voter.name);
+        });
+      }
+      const rows = Array.from(rowsById.values()).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+      const highest = rows.length ? rows[0].count : 0;
+      const leaders = rows.filter((row) => row.count === highest);
+      const tie = leaders.length > 1 && highest > 0;
+      return {
+        voters,
+        rows,
+        highest,
+        tie,
+        winnerId: !tie && highest > 0 ? leaders[0].id : null
+      };
+    }
+
     function startNight() {
       clearUndo();
+      state.vote = null;
       state.players.forEach((p) => {
         if (p.alive) {
           p.canTalk = true;
@@ -1857,6 +2363,7 @@
         promotedIds: promotion.promoted.map((p) => p.id),
         torturerPromotedBefore: beforePromoted
       };
+      state.vote = null;
       state.modal = null;
       startUndoTimer();
       vibrate(15);
@@ -1866,7 +2373,7 @@
         finishGame(winner, { preserveUndo: true });
         return;
       }
-      scheduleRender();
+      navigate("game", "day");
     }
 
     function undoEliminate() {
@@ -1938,10 +2445,13 @@
       state.phase = "setup";
       state.torturerPromoted = false;
       state.night = { steps: [], index: 0, actions: emptyActions() };
+      state.vote = null;
       state.events = [];
       state.history = [];
       state.result = null;
       state.modal = null;
+      state.setupNotice = { level: "ok", text: "New game ready. Deal again when the table is set." };
+      state.restoredAt = null;
       wantsWakeLock = false;
       releaseWakeLock();
       navigate("setup", "setup");
@@ -1949,6 +2459,147 @@
 
     function clonePlayers(list) {
       return list.map((p) => ({ ...p }));
+    }
+
+    function queuePersist() {
+      if (persistQueued) return;
+      persistQueued = true;
+      window.setTimeout(() => {
+        persistQueued = false;
+        persistState();
+      }, 0);
+    }
+
+    function persistState() {
+      try {
+        if (!window.localStorage) return;
+        const safeState = {
+          screen: state.screen,
+          phase: state.phase,
+          players: clonePlayers(state.players),
+          config: { ...state.config },
+          preset: selectedPresetId(),
+          currentName: state.screen === "setup" ? state.currentName : "",
+          revealIndex: state.revealIndex,
+          cardFlipped: false,
+          round: state.round,
+          torturerPromoted: state.torturerPromoted,
+          night: {
+            steps: state.night.steps.slice(),
+            index: state.night.index,
+            actions: { ...state.night.actions }
+          },
+          vote: state.vote ? {
+            voters: state.vote.voters.slice(),
+            index: state.vote.index,
+            ballots: { ...state.vote.ballots }
+          } : null,
+          events: state.events.map((event) => ({ ...event })),
+          history: state.history.map((round) => ({ round: round.round, events: round.events.map((event) => ({ ...event })) })),
+          result: state.result,
+          narratorTab: state.narratorTab,
+          transitionKey: state.transitionKey
+        };
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: SAVE_VERSION, savedAt: Date.now(), state: safeState }));
+      } catch (_) {}
+    }
+
+    function restoreState() {
+      try {
+        if (!window.localStorage) return false;
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        if (!parsed || parsed.version !== SAVE_VERSION || !parsed.state) return false;
+        const restored = sanitizeSavedState(parsed.state);
+        if (!restored) return false;
+        Object.assign(state, restored);
+        state.restoredAt = parsed.savedAt || Date.now();
+        state.cardFlipped = false;
+        state.modal = null;
+        state.undo = null;
+        state.setupNotice = restored.screen === "setup" && restored.players.length ? { level: "ok", text: "Saved table restored." } : null;
+        wantsWakeLock = state.screen !== "setup" && state.screen !== "gameover";
+        return true;
+      } catch (_) {
+        try { window.localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+        return false;
+      }
+    }
+
+    function sanitizeSavedState(saved) {
+      if (!saved || !Array.isArray(saved.players)) return null;
+      const players = saved.players
+        .map((player) => ({
+          id: typeof player.id === "string" && player.id ? player.id : uid(),
+          name: normalizeName(player.name).slice(0, 22) || "Player",
+          role: ROLE[player.role] ? player.role : null,
+          alive: player.alive !== false,
+          canTalk: player.canTalk !== false,
+          canVote: player.canVote !== false,
+          promoted: Boolean(player.promoted)
+        }))
+        .slice(0, 24);
+      const config = sanitizeConfig(saved.config);
+      const phase = ["setup", "reveal", "day", "vote", "night", "dawn", "over"].includes(saved.phase) ? saved.phase : "setup";
+      const screen = ["setup", "reveal", "game", "gameover"].includes(saved.screen) ? saved.screen : "setup";
+      const revealIndex = Math.max(0, Math.min(Number(saved.revealIndex) || 0, Math.max(players.length - 1, 0)));
+      const vote = saved.vote && Array.isArray(saved.vote.voters)
+        ? { voters: saved.vote.voters.filter((id) => players.some((p) => p.id === id)), index: Math.max(0, Number(saved.vote.index) || 0), ballots: saved.vote.ballots && typeof saved.vote.ballots === "object" ? { ...saved.vote.ballots } : {} }
+        : null;
+      return {
+        screen,
+        phase,
+        players,
+        config,
+        preset: selectedPresetId(config),
+        setupNotice: null,
+        currentName: screen === "setup" ? normalizeName(saved.currentName) : "",
+        revealIndex,
+        cardFlipped: false,
+        round: Math.max(1, Number(saved.round) || 1),
+        torturerPromoted: Boolean(saved.torturerPromoted),
+        night: saved.night && Array.isArray(saved.night.steps) ? { steps: saved.night.steps.filter((step) => STEP_META[step]), index: Math.max(0, Number(saved.night.index) || 0), actions: { ...emptyActions(), ...(saved.night.actions || {}) } } : { steps: [], index: 0, actions: emptyActions() },
+        vote,
+        events: Array.isArray(saved.events) ? saved.events.map(sanitizeEvent).filter(Boolean) : [],
+        history: Array.isArray(saved.history) ? saved.history.map(sanitizeHistoryRound).filter(Boolean) : [],
+        result: saved.result === "town" || saved.result === "mafia" ? saved.result : null,
+        modal: null,
+        narratorTab: saved.narratorTab === "log" ? "log" : "roles",
+        undo: null,
+        restoredAt: null,
+        transitionKey: typeof saved.transitionKey === "string" ? saved.transitionKey : `${screen}:${phase}`
+      };
+    }
+
+    function sanitizeConfig(config) {
+      const source = config && typeof config === "object" ? config : DEFAULT_CONFIG;
+      return {
+        killers: Math.max(1, Math.min(10, Number(source.killers) || DEFAULT_CONFIG.killers)),
+        torturers: Math.max(0, Math.min(8, Number(source.torturers) || 0)),
+        doctors: Math.max(0, Math.min(6, Number(source.doctors) || 0)),
+        detectives: Math.max(0, Math.min(6, Number(source.detectives) || 0)),
+        whore: Boolean(source.whore),
+        joker: Boolean(source.joker)
+      };
+    }
+
+    function sanitizeEvent(event) {
+      if (!event || typeof event !== "object") return null;
+      return {
+        kind: ["death", "save", "info", "torture"].includes(event.kind) ? event.kind : "info",
+        icon: ICON[event.icon] ? event.icon : "info",
+        title: normalizeName(event.title) || "Event",
+        message: normalizeName(event.message)
+      };
+    }
+
+    function sanitizeHistoryRound(round) {
+      if (!round || !Array.isArray(round.events)) return null;
+      return {
+        round: Math.max(1, Number(round.round) || 1),
+        events: round.events.map(sanitizeEvent).filter(Boolean)
+      };
     }
 
     async function ensureAudio() {
@@ -2033,12 +2684,17 @@
       const action = actionable.dataset.action;
       if (action === "modal-backdrop" && event.target !== actionable) return;
       if (action === "add-player") addPlayer();
-      if (action === "remove-player") { state.players = state.players.filter((p) => p.id !== actionable.dataset.id); pulse("tap"); scheduleRender(); }
+      if (action === "remove-player") { state.players = state.players.filter((p) => p.id !== actionable.dataset.id); state.setupNotice = null; pulse("tap"); scheduleRender(); }
+      if (action === "apply-preset") applyPreset(actionable.dataset.preset);
       if (action === "config-step") setConfigStep(actionable.dataset.key, Number(actionable.dataset.delta));
-      if (action === "config-toggle") { state.config[actionable.dataset.key] = !state.config[actionable.dataset.key]; pulse("tap"); scheduleRender(); }
+      if (action === "config-toggle") { state.config[actionable.dataset.key] = !state.config[actionable.dataset.key]; state.preset = selectedPresetId(); state.setupNotice = null; pulse("tap"); scheduleRender(); }
       if (action === "start-game") startGame();
       if (action === "flip-card") flipCard();
       if (action === "next-reveal") nextReveal();
+      if (action === "start-vote") startVote();
+      if (action === "cast-vote") castVote(actionable.dataset.id || null);
+      if (action === "restart-vote") startVote();
+      if (action === "cancel-vote") cancelVote();
       if (action === "open-eliminate") openEliminate(actionable.dataset.id);
       if (action === "confirm-eliminate") confirmEliminate(actionable.dataset.id);
       if (action === "undo-eliminate") undoEliminate();
@@ -2055,11 +2711,16 @@
       if (action === "next-step") nextStep();
       if (action === "skip-step") skipStep();
       if (action === "begin-day") beginDay();
-      if (action === "new-game") resetGame();
+      if (action === "new-game") { state.modal = { type: "reset" }; pulse("tap"); scheduleRender(); }
+      if (action === "confirm-reset") resetGame();
     }
 
     function handleInput(event) {
-      if (event.target && event.target.id === "player-name-field") state.currentName = event.target.value;
+      if (event.target && event.target.id === "player-name-field") {
+        state.currentName = event.target.value;
+        if (state.setupNotice) state.setupNotice = null;
+        queuePersist();
+      }
     }
 
     function handleKey(event) {
@@ -2141,6 +2802,18 @@
       assert(torturerTargets(players).some((p) => p.role === "torturer"), "Torturer can target self");
       assert(getWinner([make("killer", "K"), make("civilian", "C")]) === "mafia", "Mafia parity win");
       assert(getWinner([make("civilian", "C")]) === "town", "Town wins when Mafia gone");
+
+      players = [make("killer", "Alex"), make("doctor", "alex"), make("civilian", "Mara")];
+      assert(validation({ ...DEFAULT_CONFIG, detectives: 0 }, players).text === "Player names must be unique.", "Duplicate names are rejected");
+
+      players = [make("killer", "K"), make("civilian", "A"), make("civilian", "B")];
+      let vote = { voters: [players[0].id, players[1].id, players[2].id], index: 3, ballots: { [players[0].id]: players[1].id, [players[1].id]: players[2].id, [players[2].id]: players[1].id } };
+      assert(voteSummary(vote, players).winnerId === players[1].id, "Vote winner resolves by highest tally");
+      vote = { voters: [players[0].id, players[1].id], index: 2, ballots: { [players[0].id]: players[1].id, [players[1].id]: players[0].id } };
+      assert(voteSummary(vote, players).tie, "Voting tie blocks automatic elimination");
+
+      const restored = sanitizeSavedState({ screen: "reveal", phase: "reveal", players, config: DEFAULT_CONFIG, revealIndex: 999, cardFlipped: true });
+      assert(restored && restored.revealIndex === 2 && restored.cardFlipped === false, "Saved reveal state hides card after refresh");
       return true;
     }
 
@@ -2162,9 +2835,14 @@
       resolveNightCore,
       getWinner,
       doctorTargets,
-      torturerTargets
+      torturerTargets,
+      validation,
+      voteSummary,
+      createVoteState,
+      sanitizeSavedState
     };
 
+    if (restoreState() && wantsWakeLock) acquireWakeLock();
     createStars();
     scheduleRender(true);
   </script>
